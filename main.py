@@ -5,7 +5,7 @@ from string import digits
 import cv2
 import numpy as np
 
-from pixel.gaussian_naive_bayes import PixelMLESklearnClassifier
+from pixel.gaussian_naive_bayes import PixelGNBClassifier
 
 labels = dict(animal=1, chair=2)
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     shape = get_shape(data)
     train_data, validation_data, test_data = split_data(data)
 
-    classifier = PixelMLESklearnClassifier()
+    classifier = PixelGNBClassifier()
     classifier.train(train_data, validation_data)
 
     test_data = train_data + validation_data + test_data

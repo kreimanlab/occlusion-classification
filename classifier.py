@@ -25,3 +25,13 @@ class Classifier:
     @staticmethod
     def get_labels(data):
         return theano.shared(numpy.asarray([d['label'] for d in data], dtype=theano.config.floatX), borrow=True)
+
+    @staticmethod
+    def flatten_matrix(matrix):
+        """
+        takes in an (m, n) numpy array and flattens it
+        into an array of shape (1, m * n)
+        """
+        s = matrix.shape[0] * matrix.shape[1]
+        matrix_wide = matrix.reshape(1, s)
+        return matrix_wide[0]
