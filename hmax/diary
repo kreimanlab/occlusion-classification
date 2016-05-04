@@ -1,0 +1,10 @@
+figure();
+for b=1:8
+for j=1:2
+for i=1:4
+subplot(8,2*4,(b-1)*8+(j-1)*4+i);
+imshow(s1{1, 1}{1, b}{1, j}{1,i});
+end
+end
+end
+diary
