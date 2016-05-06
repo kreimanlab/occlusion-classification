@@ -1,5 +1,5 @@
 function [c2,c1,bestBands,bestLocations,s2,s1] = ...
-    train(images,saveFolder)
+    getHmaxOutput(images,saveFolder)
 % derived from example.m
 
 %% If no arguments are provided, these are the default variables.

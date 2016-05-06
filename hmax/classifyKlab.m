@@ -1,8 +1,8 @@
 function [predicted_classes] = ...
-    classify(stored_output)
+    classifyKlab(stored_output)
 
-USE_SAVED_C2TEST=true;
-USE_SAVED_PREDICTION=true;
+USE_SAVED_C2TEST=false;
+USE_SAVED_PREDICTION=false;
 
 %% Load previous output
 if (nargin < 1)
@@ -29,7 +29,7 @@ classifier = fitcecoc(c2_bands_pool,labels);
 %% test
 % prepare
 load('../data/KLAB325.mat');
-test_indices = [{1,1:5}; {1,61:65}];
+test_indices = [{1,5:7}; {1,65:67}];
 test_imgs = [img_mat(test_indices{1,1},test_indices{1,2}),...
     img_mat(test_indices{2,1},test_indices{2,2})];
 real_test_labels = [data.truth(test_indices{1,2},test_indices{1,1});...
@@ -39,7 +39,7 @@ saved_c2test_file='./output-test/activations.mat';
 if USE_SAVED_C2TEST
     load(saved_c2test_file);
 else
-    [c2_test,c1_test]=train(test_imgs,'./output-test/');
+    [c2_test,c1_test]=getHmaxOutput(test_imgs,'./output-test/');
 end
 saved_predictions_file='./output-test/predictions.mat';
 if USE_SAVED_PREDICTION
