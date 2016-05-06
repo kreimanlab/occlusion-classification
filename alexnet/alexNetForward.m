@@ -1,6 +1,6 @@
 % Forward path implementation of AlexNet
 
-%% Preparatoin
+%% Preparation
 % Load network parameters.
 netParams=load('./ressources/alexnetParams.mat'); % obtained from https://drive.google.com/file/d/0B-VdpVMYRh-pQWV1RWt5NHNQNnc/view
 conv1Kernels=netParams.weights(1).weights{1};
