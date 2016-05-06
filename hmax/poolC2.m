@@ -1,5 +1,4 @@
-function c2_bands_pool = ...
-    poolC2(c2)
+function c2_bands_pool = poolC2(c2)
 c2_bands_pool = zeros(fliplr(size(c2{1,1})));
 n_training_imgs = size(c2{1,1},2);
 for i = 1:n_training_imgs
@@ -10,5 +9,4 @@ for i = 1:n_training_imgs
         end
         c2_bands_pool(i,f) = max(band_elements);
     end
-end
 end
