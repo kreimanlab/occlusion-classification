@@ -12,10 +12,11 @@ end
 
 saveFolder = ['./data/' classifier.getName()];
 if ~exist(saveFolder, 'dir')
-    mkdir();
+    mkdir(saveFolder);
 end
 
 %% Train
+fprintf('Training...\n');
 numTrainImages = length(trainImages);
 % extract features
 trainFeaturesSaveFile = [saveFolder '/train_features-' num2str(numTrainImages) '.mat'];
@@ -30,6 +31,7 @@ end
 classifier.fit(trainFeatures, trainLabels);
 
 %% Test
+fprintf('Testing...\n');
 numTestImages = length(testImages);
 % predict
 testFeaturesSaveFile = [saveFolder '/test_features-' num2str(numTestImages) '.mat'];
