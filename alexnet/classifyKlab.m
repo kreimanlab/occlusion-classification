@@ -1,8 +1,8 @@
-FC7OUTPUT_LENGTH=4096;
+FC7OUTPUT_LENGTH = 4096;
 
 %% Preparation
 % Load network parameters.
-netParams=load('./ressources/alexnetParams.mat'); % obtained from https://drive.google.com/file/d/0B-VdpVMYRh-pQWV1RWt5NHNQNnc/view
+netParams = load('./ressources/alexnetParams.mat'); % obtained from https://drive.google.com/file/d/0B-VdpVMYRh-pQWV1RWt5NHNQNnc/view
 
 % Load data
 addpath('../data');
@@ -10,13 +10,7 @@ addpath('../data');
 
 %% get output for images
 disp 'Computing image activations...'
-alexnetOutputs = zeros(length(images),FC7OUTPUT_LENGTH);
-for img=1:length(images)
-    data = prepareGrayscaleImage(images{img});
-    % extract features
-    fc7=getFc7Output(netParams, data);
-    alexnetOutputs(img,:) = fc7(:);
-end
+alexnetOutputs = getImageFc7Outputs(images);
 
 %% train classifier
 disp 'Training classifier...'
