@@ -1,13 +1,9 @@
-function [] = runClassifier(classifier, ...
+function results = runClassifier(classifier, ...
     trainImages, trainLabels, ...
     testImages, testLabels)
-addpath('./data');
 
 if nargin < 1
-    classifier = HmaxClassifier();
-    [trainImages, trainLabels] = getExperimentalData();
-    testImages = trainImages;
-    testLabels = trainLabels;
+    error('not enough arguments');
 end
 
 saveFolder = ['./data/' classifier.getName()];
@@ -53,6 +49,7 @@ end
 % analyze
 resultsSaveFile = [saveFolder '/results-' num2str(numTestImages) '.mat'];
 [matched, accuracy] = analyzeResults(predictedLabels, testLabels);
-results = struct('predicted', predictedLabels, 'real', testLabels,...
+results = struct('name', classifier.getName(), ...
+    'predicted', predictedLabels, 'real', testLabels,...
     'matched', matched, 'accuracy', accuracy);
 save(resultsSaveFile, 'results');
