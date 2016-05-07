@@ -1,13 +1,5 @@
 function [c2,c1,bestBands,bestLocations,s2,s1] = ...
-    runHmax(images,saveFolder)
-% derived from example.m
-
-%% If no arguments are provided, these are the default variables.
-if (nargin < 1)
-    saveFolder = './output/';
-    load('../data/KLAB325.mat');
-    images = [img_mat(1,1:5), img_mat(1,61:65)];
-end
+    runHmax(images)
 
 %% Preprocess the images.
 % Creates a cell array with each cell containing a grayscaled
@@ -23,12 +15,12 @@ RFsizes      = 7:2:39;        % receptive field sizes
 div          = 4:-.05:3.2;    % tuning parameters for the filters' "tightness"
 [filterSizes,filters,c1OL,~] = initGabor(orientations,RFsizes,div);
 
-fprintf('initializing C1 parameters\n')
+fprintf('initializing C1 parameters\n');
 c1Scale = 1:2:18; % defining 8 scale bands
 c1Space = 8:2:22; % defining spatial pooling range for each scale band
 
 %% Load the universal patch set.
-fprintf('Loading the universal patch set\n')
+fprintf('Loading the universal patch set\n');
 load('universal_patch_set.mat','patches','patchSizes');
 
 nPatchSizes = size(patchSizes,2);
@@ -39,9 +31,3 @@ fprintf('calculating unit responses\n');
 
 [c2,c1,bestBands,bestLocations,s2,s1] = extractC2forCell...
     (filters,filterSizes,c1Space,c1Scale,c1OL,patches,images,nPatchSizes,patchSizes(1:3,:));
-
-%% Save the output
-save([saveFolder 'activations.mat'], '-v7.3', ...
-    'c2','bestBands','bestLocations'...
-    );
-%            ,'c1','s2','s1'...
