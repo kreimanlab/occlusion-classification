@@ -52,5 +52,7 @@ else
 end
 % analyze
 resultsSaveFile = [saveFolder '/results-' num2str(numTestImages) '.mat'];
-results = analyzeResults(predictedLabels, testLabels);
+[matched, accuracy] = analyzeResults(predictedLabels, testLabels);
+results = struct('predicted', predictedLabels, 'real', testLabels,...
+    'matched', matched, 'accuracy', accuracy);
 save(resultsSaveFile, 'results');
