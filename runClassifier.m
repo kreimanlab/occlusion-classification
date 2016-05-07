@@ -3,10 +3,6 @@ function [results] = runClassifier(classifier, ...
     testImages, testLabels)
 addpath('./data');
 
-USE_SAVED_TRAIN_FEATURES = false;
-USE_SAVED_TEST_FEATURES = false;
-USE_SAVED_PREDICTION = false;
-
 if nargin < 1
     classifier = HmaxClassifier();
     [trainImages, trainLabels] = getExperimentalData();
@@ -14,14 +10,18 @@ if nargin < 1
     testLabels = trainLabels;
 end
 
-mkdir(['./data/' classifier.getName()]);
+saveFolder = ['./data/' classifier.getName()];
+if ~exist(saveFolder, 'dir')
+    mkdir();
+end
 
 %% Train
+numTrainImages = length(trainImages);
 % extract features
-trainFeaturesSaveFile = ['./data/' classifier.getName() '/train-features.mat'];
-if USE_SAVED_TRAIN_FEATURES
-    savedOutput = load(trainFeaturesSaveFile);
-    trainFeatures = savedOutput.c2;
+trainFeaturesSaveFile = [saveFolder '/train_features-' num2str(numTrainImages) '.mat'];
+if exist(trainFeaturesSaveFile, 'file')
+    fprintf('Loading saved train features %s\n', trainFeaturesSaveFile)
+    load(trainFeaturesSaveFile);
 else
     trainFeatures = classifier.extractFeatures(trainImages);
     save(trainFeaturesSaveFile, 'trainFeatures');
@@ -30,22 +30,25 @@ end
 classifier.fit(trainFeatures, trainLabels);
 
 %% Test
+numTestImages = length(testImages);
 % predict
-testFeaturesSaveFile = ['./data/' classifier.getName() '/test-features.mat'];
-if USE_SAVED_TEST_FEATURES
+testFeaturesSaveFile = [saveFolder '/test_features-' num2str(numTestImages) '.mat'];
+if exist(testFeaturesSaveFile, 'file')
+    fprintf('Loading saved test features %s\n', testFeaturesSaveFile);
     load(testFeaturesSaveFile);
 else
     testFeatures = classifier.extractFeatures(testImages);
     save(testFeaturesSaveFile, 'testFeatures');
 end
-predictionsSaveFile = ['./data/' classifier.getName() '/predictions.mat'];
-if USE_SAVED_PREDICTION
+predictionsSaveFile = [saveFolder '/predictions-' num2str(numTestImages) '.mat'];
+if exist(predictionsSaveFile, 'file')
+    fprintf('Loading saved predictions %s\n', predictionsSaveFile);
     load(predictionsSaveFile);
 else
     predictedLabels = classifier.predict(testFeatures);
     save(predictionsSaveFile, 'predictedLabels');
 end
 % analyze
-resultsSaveFile = ['./data/' classifier.getName() '/results.mat'];
+resultsSaveFile = [saveFolder '/results-' num2str(numTestImages) '.mat'];
 results = analyzeResults(predictedLabels, testLabels);
 save(resultsSaveFile, 'results');
