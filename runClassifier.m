@@ -12,7 +12,7 @@ if ~exist(saveFolder, 'dir')
 end
 
 %% Train
-fprintf('Training...\n');
+fprintf('Training %s...\n', classifier.getName());
 numTrainImages = length(trainImages);
 % extract features
 trainFeaturesSaveFile = [saveFolder '/train_features-' num2str(numTrainImages) '.mat'];
@@ -27,7 +27,7 @@ end
 classifier.fit(trainFeatures, trainLabels);
 
 %% Test
-fprintf('Testing...\n');
+fprintf('Testing %s...\n', classifier.getName());
 numTestImages = length(testImages);
 % predict
 testFeaturesSaveFile = [saveFolder '/test_features-' num2str(numTestImages) '.mat'];
