@@ -3,6 +3,7 @@ addpath('./data');
 addpath('./pixel');
 addpath('./hmax');
 addpath('./alexnet');
+addpath(genpath('./helper'));
 
 %% Setup
 % classifiers
