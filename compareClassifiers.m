@@ -28,6 +28,6 @@ for i = 1:length(classifiers)
 end
 
 % display
-barwitherr(std(accuracies{:}), mean(accuracies{:}));
+barwitherr(std(cell2mat(accuracies')), mean(cell2mat(accuracies')));
 set(gca, 'XTick', 1:length(classifierNames), 'XTickLabel', classifierNames);
 end
