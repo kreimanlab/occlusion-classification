@@ -4,22 +4,29 @@ addpath('./pixel');
 addpath('./hmax');
 addpath('./alexnet');
 
-classifiers = cell(3, 1);
-classifiers{1} = SvmClassifier();
-classifiers{2} = HmaxClassifier();
-classifiers{3} = AlexnetClassifier();
-[trainImages, trainLabels] = getExperimentalData();
-testImages = trainImages;
-testLabels = trainLabels;
+%% Setup
+% classifiers
+classifiers = {SvmClassifier()};%, HmaxClassifier(), AlexnetClassifier()};
+% data
+[images, labels] = getExperimentalData();
+% cross validation
+rng(1, 'twister'); % seed and use pseudo random generator for reproducibility
+% function to retrieve the accuracy from a run result
+    function accuracy = runAndGetAccuracy(classifier, xtrain, ytrain, xtest, ytest)
+        results = runClassifier(classifier, xtrain, ytrain, xtest, ytest);
+        accuracy = results.accuracy;
+    end
 
-results = cell(length(classifiers), 1);
-accuracies = zeros(length(results), 1);
+%% Run
+accuracies = cell(length(classifiers), 1);
 classifierNames = cell(length(classifiers), 1);
 for i = 1:length(classifiers)
-    results{i} = runClassifier(classifiers{i}, ...
-        trainImages, trainLabels, testImages, testLabels);
-    classifierNames{i} = results{i}.name;
-    accuracies(i) = results{i}.accuracy;
+    runner = curry(@runAndGetAccuracy, classifiers{i});
+    accuracies{i} = crossval(runner, images', labels);
+    classifierNames{i} = classifiers{i}.getName();
 end
-bar(accuracies);
+
+% display
+barwitherr(std(accuracies{:}), mean(accuracies{:}));
 set(gca, 'XTick', 1:length(classifierNames), 'XTickLabel', classifierNames);
+end
