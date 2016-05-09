@@ -6,10 +6,12 @@ addpath('./alexnet');
 addpath(genpath('./helper'));
 
 %% Setup
-% classifiers
-classifiers = {SvmClassifier()};%, HmaxClassifier(), AlexnetClassifier()};
 % data
-[images, labels] = getExperimentalData();
+[images, labels] = getExperimentalData([1:10, 66:75]);
+% classifiers
+classifiers = {SvmClassifier(), HmaxClassifier(), AlexnetClassifier()};
+cachingClassifierConstructor = curry(@CachingClassifier, images);
+classifiers = cellfun(@(c) {cachingClassifierConstructor(c)}, classifiers);
 % cross validation
 rng(1, 'twister'); % seed and use pseudo random generator for reproducibility
 % function to retrieve the accuracy from a run result
