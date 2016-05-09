@@ -15,18 +15,17 @@ classdef HmaxClassifier < Classifier
         end
         
         function features = extractFeatures(~, images)
-            features = runHmax(images);
+            c2 = runHmax(images);
+            features = poolC2(c2);
+            assert(length(images) == size(features, 1));
         end
         
         function fit(self, features, labels)
-            c2Pooled = poolC2(features);
-            assert(length(labels) == size(c2Pooled,1));
-            self.classifier = fitcecoc(c2Pooled,labels);
+            self.classifier = fitcecoc(features,labels);
         end
         
         function labels = predict(self, features)
-            c2Pooled = poolC2(features);
-            labels = self.classifier.predict(c2Pooled);
+            labels = self.classifier.predict(features);
         end
     end
 end
