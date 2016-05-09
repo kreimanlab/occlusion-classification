@@ -10,20 +10,19 @@ originalImages = imagesData.img_mat;
 occlusionDataFile = [dir '/data_occlusion_main.mat'];
 load(occlusionDataFile);
 % output
-outputDirectory = [dir '/images-occluded/'];
-if ~exist(outputDirectory, 'dir')
-    mkdir(outputDirectory);
-end
+outputFile = [dir '/KLAB325-occluded.mat'];
 
 %% Run
+img_mat = cell(1, length(originalImages));
 for i = 1:length(originalImages)
     disp(['image #' num2str(i)])
-    im = originalImages{i};
+    image = originalImages{i};
     numBubbles = data.nbubbles(i);
     c = data.bubble_centers(i, 1:numBubbles);
     
     S.c = c;
     S.sig = bub_sig * ones(1,numBubbles);
-    [im,~] = AddBubble(im, S);
-    imwrite(im, [outputDirectory 'im_' num2str(i) '.tif']);
+    [occludedImage,~] = AddBubble(image, S);
+    img_mat{i} = occludedImage;
 end
+save(outputFile, 'img_mat');
