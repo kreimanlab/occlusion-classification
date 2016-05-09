@@ -9,7 +9,9 @@ addpath(genpath('./helper'));
 % data
 [images, labels] = getExperimentalData([1:10, 66:75]);
 % classifiers
-classifiers = {SvmClassifier(), HmaxClassifier(), AlexnetClassifier()};
+classifiers = {SvmClassifier(), ...
+    HmaxClassifier(), ...
+    AlexnetFc7Classifier(), AlexnetPool5Classifier()};
 cachingClassifierConstructor = curry(@CachingClassifier, images);
 classifiers = cellfun(@(c) {cachingClassifierConstructor(c)}, classifiers);
 % cross validation
