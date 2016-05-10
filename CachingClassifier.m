@@ -1,8 +1,11 @@
 classdef CachingClassifier < Classifier
-    % Classifier that pre-caches the features.
-    % Also creates a cache file for every single image individually
-    % so that subsequent calls do not have to re-compute
-    % the features for that images.
+    % Classifier that lazily caches the features.
+    % Whenever features are extracted, the cached features are used if the
+    % image hash exists in the cache.
+    % If the hash does not exist in the cache, attempts to load the
+    % features from the corresponding file.
+    % If such a file does not exist, computes the features and saves them
+    % in the cache and in a file.
     
     properties
         classifier
@@ -11,10 +14,10 @@ classdef CachingClassifier < Classifier
     end
     
     methods
-        function self = CachingClassifier(images, classifier)
+        function self = CachingClassifier(classifier)
             self.classifier = classifier;
             self.setupSaveFolder();
-            self.setupCache(images);
+            self.cache = containers.Map();
         end
         
         function name = getName(self)
@@ -32,48 +35,41 @@ classdef CachingClassifier < Classifier
         function features = extractFeatures(self, images)
             boxedFeatures = cell(length(images), 1);
             for i = 1:length(images)
-                boxedFeatures{i} = self.cache(self.hashImage(images{i}));
+                boxedFeatures{i} = self.getImageFeatures(images{i});
             end
             features = cell2mat(boxedFeatures);
         end
     end
     
-    methods (Access=private)        
-        function setupCache(self, images)
-            % map expects 1-by-n array
-            boxedFeatures = cell(1, length(images));
-            hashes = cell(1, length(images));
-            for i = 1:length(images)
-                features = self.loadOrExtractFeatures(images{i});
-                boxedFeatures{i} = features(1, :);
-                hashes{i} = self.hashImage(images{i});
-            end
-            self.cache = containers.Map(hashes, boxedFeatures);
-        end
-        
-        function features = loadOrExtractFeatures(self, image)
-            featuresSaveFile = [self.saveFolder '/' ...
-                self.hashImage(image) '.mat'];
-            if exist(featuresSaveFile, 'file')
-                loadedData = load(featuresSaveFile);
-                features = loadedData.features;
+    methods (Access=private)
+        function boxedFeatures = getImageFeatures(self, image)
+            imageHash = hashImage(image);
+            % retrieve from cache
+            if isKey(self.cache, imageHash)
+                boxedFeatures = self.cache(imageHash);
             else
-                features = self.classifier.extractFeatures({image});
-                save(featuresSaveFile, 'features');
+                featuresSaveFile = [self.saveFolder '/' imageHash '.mat'];
+                % retrieve from file
+                if exist(featuresSaveFile, 'file')
+                    loadedData = load(featuresSaveFile);
+                    boxedFeatures = loadedData.features(1, :);
+                    self.cache(imageHash) = boxedFeatures;
+                else % compute from scratch
+                    features = self.classifier.extractFeatures({image});
+                    boxedFeatures = features(1, :);
+                    self.cache(imageHash) = boxedFeatures;
+                    save(featuresSaveFile, 'features');
+                end
             end
         end
         
         function setupSaveFolder(self)
             self.saveFolder = ['./data/' self.classifier.getName() ...
                 '/features-cache'];
-           
+            
             if ~exist(self.saveFolder, 'dir')
                 mkdir(self.saveFolder);
-            end 
-        end
-        
-        function hash = hashImage(~, image)
-            hash = GetMD5(image, 'Array');
+            end
         end
     end
 end
