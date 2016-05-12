@@ -30,7 +30,7 @@ classdef AlexnetClassifier < Classifier
                 reshape(features, [size(features, 1) self.featuresLength]));
         end
         
-        function features = extractFeatures(self, images)
+        function features = extractFeatures(self, images, ~)
             features = zeros(length(images), self.featuresLength);
             for img=1:length(images)
                 preparedImage = prepareGrayscaleImage(images{img}, self.imagesMean);

@@ -27,9 +27,12 @@ classdef ImageProvidingClassifier < Classifier
             labels = self.classifier.predict(features);
         end
         
-        function features = extractFeatures(self, dataSelection)
-            images = self.images(self.data.pres(dataSelection));
-            features = self.classifier.extractFeatures(images);
+        function features = extractFeatures(self, dataSelection, runType)
+            imgs = self.images(self.data.pres(dataSelection));
+            if runType == RunType.Test
+                imgs = occlude(imgs, dataSelection, self.data);
+            end
+            features = self.classifier.extractFeatures(imgs, runType);
         end
     end
 end

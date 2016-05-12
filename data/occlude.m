@@ -1,9 +1,11 @@
-function occludedImages = occlude(images, percentVisible, occlusionData)
+function occludedImages = occlude(images, dataSelection, occlusionData)
 
+bub_sig = 14;
 occludedImages = cell(length(images), 1);
 for i = 1:length(images)
-    numBubbles = occlusionData.nbubbles(i);
-    S.c = occlusionData.bubble_centers(i, 1:numBubbles);
-    S.sig = percentVisible * ones(1, numBubbles);
+    row = dataSelection(i);
+    numBubbles = occlusionData.nbubbles(row);
+    S.c = occlusionData.bubble_centers(row, 1:numBubbles);
+    S.sig = bub_sig * ones(1, numBubbles);
     occludedImages{i} = AddBubble(images{i}, S);
 end

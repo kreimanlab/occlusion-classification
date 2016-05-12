@@ -32,17 +32,18 @@ classdef CachingClassifier < Classifier
             labels = self.classifier.predict(features);
         end
         
-        function features = extractFeatures(self, images)
+        function features = extractFeatures(self, images, runType)
             boxedFeatures = cell(length(images), 1);
             for i = 1:length(images)
-                boxedFeatures{i} = self.getImageFeatures(images{i});
+                boxedFeatures{i} = self.getImageFeatures(images{i}, ...
+                    runType);
             end
             features = cell2mat(boxedFeatures);
         end
     end
     
     methods (Access=private)
-        function boxedFeatures = getImageFeatures(self, image)
+        function boxedFeatures = getImageFeatures(self, image, runType)
             imageHash = hashImage(image);
             % retrieve from cache
             if isKey(self.cache, imageHash)
@@ -55,7 +56,8 @@ classdef CachingClassifier < Classifier
                     boxedFeatures = loadedData.features(1, :);
                     self.cache(imageHash) = boxedFeatures;
                 else % compute from scratch
-                    features = self.classifier.extractFeatures({image});
+                    features = self.classifier.extractFeatures({image}, ...
+                        runType);
                     boxedFeatures = features(1, :);
                     self.cache(imageHash) = boxedFeatures;
                     save(featuresSaveFile, 'features');

@@ -6,7 +6,7 @@ classdef Classifier < handle
     
     methods (Abstract)
         getName(self)
-        extractFeatures(self, images)
+        extractFeatures(self, images, runType)
         fit(self, features, labels)
         predict(self, images)
     end

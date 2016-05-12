@@ -1,6 +1,8 @@
 function compareClassifiersOccluded(dataMin, dataMax)
 if nargin < 1
-    dataMin = 1; dataMax = 5000;
+    dataMin = 1; dataMax = 1000;
+else
+    dataMin = str2num(dataMin); dataMax = str2num(dataMax);
 end
 
 addpath('./data');
@@ -17,7 +19,7 @@ dataSelection = dataMin:dataMax;
 data = dataset(dataSelection, :);
 % classifiers
 featureProvidingConstructor = curry(@FeatureProvidingClassifier, ...
-    dataSelection);
+    data, dataSelection);
 classifiers = {ImageProvidingClassifier(data, PixelClassifier()), ...
     featureProvidingConstructor(HmaxClassifier()), ...
     featureProvidingConstructor(AlexnetPool5ClassifierKlabData()), ...
@@ -36,7 +38,7 @@ rng(1, 'twister'); % seed, use pseudo random generator for reproducibility
         end
     end
 kfold = 2;
-stepSize = 5;
+stepSize = 15;
 percentsVisible = 0:stepSize:35;
 results = repmat(struct('name', [], 'predicted', [], 'real', [], ...
     'matched', [], 'accuracy', []), ... % need to pre-allocate array
