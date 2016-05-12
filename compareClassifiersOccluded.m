@@ -9,6 +9,7 @@ addpath('./data');
 addpath('./pixel');
 addpath('./hmax');
 addpath('./alexnet');
+addpath('./visualize');
 addpath(genpath('./helper'));
 
 %% Setup
@@ -42,7 +43,7 @@ stepSize = 15;
 percentsVisible = 0:stepSize:35;
 results = repmat(struct('name', [], 'predicted', [], 'real', [], ...
     'matched', [], 'accuracy', []), ... % need to pre-allocate array
-    length(classifiers), length(percentsVisible), kfold);
+    length(percentsVisible), length(classifiers), kfold);
 for iPv = 1:length(percentsVisible)
     fprintf('%d percent visibility\n', percentsVisible(iPv));
     percentBlack = 100 - percentsVisible(iPv);
@@ -53,25 +54,12 @@ for iPv = 1:length(percentsVisible)
     classifierResults = crossval(runner, ...
         dataSelectionSubset', data.truth(dataSelectionSubset), ...
         'kfold', kfold)';
-    results(:, iPv, :) = cell2mat(classifierResults);
+    results(iPv, :, :) = cell2mat(classifierResults);
 end
 save(['data/compareOccluded/' ...
-    datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'], 'results');
+    datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'], ...
+    'percentsVisible', 'results');
 
 %% display
-% reshape to visibility x classifiers x trials
-accuracies = 100 * reshape([results.accuracy], ...
-    length(percentsVisible), length(classifiers), kfold);
-classifierNames = {results(:, 1, 1).name};
-figure();
-hold on;
-xlim([min(percentsVisible)-3, max(percentsVisible)+3]);
-ylim([0 100]);
-errorbar(permute(repmat(percentsVisible, 4, 1), [2 1]), ...
-    mean(accuracies, 3), std(accuracies, 0, 3), 'o-');
-plot(get(gca,'xlim'), [20 20], '--k');
-xlabel('Percent Visible');
-ylabel('Performance');
-legend(classifierNames);
-hold off;
+displayResults(percentsVisible, results);
 end
