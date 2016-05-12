@@ -26,7 +26,7 @@ classdef OcclusionDataProvider
     methods(Access = private)
         function occlusionData = prepareOcclusionData(~, dataSelection)
             dir = fileparts(mfilename('fullpath'));
-            occlusionData = load([dir '/data_occlusion_main.mat']);
+            occlusionData = load([dir '/data_occlusion_klab325v2.mat']);
             occlusionData = occlusionData.data(dataSelection, :);
         end
     end
