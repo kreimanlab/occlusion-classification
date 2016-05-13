@@ -8,6 +8,7 @@ classdef HopClassifier < Classifier
         net
         threshold = 0
         steps = 10
+        downsampledLength
     end
     
     methods
@@ -24,7 +25,7 @@ classdef HopClassifier < Classifier
             T = self.classifier.extractFeatures(images, runType);
             T = self.downsample(T);
             T(T > self.threshold) = 1;
-            T(T == self.threshold) = -1;
+            T(T <= self.threshold) = -1;
             features = T;
         end
         
@@ -46,9 +47,9 @@ classdef HopClassifier < Classifier
     
     methods(Access = private)
         function downsampledFeatures = downsample(self, features)
-            downsampledFeatures = zeros(size(features, 1), ...
-                self.downsampledLength);
             sampleSteps = ceil(size(features, 2) / self.downsampledLength);
+            downsampledFeatures = zeros(size(features, 1), ...
+                ceil(size(features, 2) / sampleSteps));
             for i = 1:size(features, 1)
                 downsampledFeatures(i, :) = downsample(features(i, :), ...
                     sampleSteps);
