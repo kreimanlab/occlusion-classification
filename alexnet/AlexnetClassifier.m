@@ -27,10 +27,11 @@ classdef AlexnetClassifier < Classifier
         
         function labels = predict(self, features)
             labels = self.classifier.predict(...
-                reshape(features, [size(features, 1) self.featuresLength]));
+                reshape(features, [size(features, 1), ...
+                numel(features) / size(features, 1)]));
         end
         
-        function features = extractFeatures(self, images, ~)
+        function features = extractFeatures(self, images)
             features = zeros(length(images), self.featuresLength);
             for img=1:length(images)
                 preparedImage = prepareGrayscaleImage(images{img}, self.imagesMean);
@@ -41,6 +42,6 @@ classdef AlexnetClassifier < Classifier
     end
     
     methods(Abstract)
-        getImageFeatures(self, image)
+        getImageFeatures(self, image, runType)
     end
 end
