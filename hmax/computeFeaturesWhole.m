@@ -1,6 +1,6 @@
 function computeFeaturesWhole()
 
-writeOutEvery = 100;
+writeOutEvery = 10;
 
 dir = fileparts(mfilename('fullpath'));
 addpath([dir '/../data']);
@@ -21,7 +21,7 @@ for dataIter = 1:totalLength
     if mod(dataIter, writeOutEvery) == 0 || dataIter == totalLength
         save([dir '/../data/OcclusionModeling/features/klab325_orig/'...
             'hmax_all_' num2str(dataIter-writeOutEvery+1) '-' num2str(dataIter) '.mat'], ...
-            'features');
+            '-v7.3', 'features');
         featuresIter = 1;
     else
         featuresIter = featuresIter + 1;

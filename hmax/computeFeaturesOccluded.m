@@ -3,7 +3,7 @@ function computeFeaturesOccluded()
 dir = fileparts(mfilename('fullpath'));
 addpath([dir '/../data']);
 
-writeOutEvery = 100;
+writeOutEvery = 10;
 
 wholeImages = getWholeImages();
 occlusionData = load([dir '/../data/data_occlusion_klab325v2.mat']);
@@ -26,7 +26,7 @@ for dataIter = 1:totalLength
     if mod(dataIter, writeOutEvery) == 0 || dataIter == totalLength
         save([dir '/../data/OcclusionModeling/features/data_occlusion_klab325v2/'...
             'hmax_all_' num2str(dataIter-writeOutEvery+1) '-' num2str(dataIter) '.mat'], ...
-            'features');
+            '-v7.3', 'features');
         featuresIter = 1;
     else
         featuresIter = featuresIter + 1;
