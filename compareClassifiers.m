@@ -28,10 +28,14 @@ addpath(genpath('./helper'));
 dataset = load('data_occlusion_klab325v2.mat');
 dataset = dataset.data;
 dataSelection = dataMin:dataMax;
-data = dataset(dataSelection, :);
+dataset = dataset(dataSelection, :);
+dataset.occluded = []; % delete unneeded columns to free up space
+dataset.scramble = []; dataset.pres_time = []; dataset.reaction_times = [];
+dataset.responses = []; dataset.correct = []; dataset.VBLsoa = [];
+dataset.masked = []; dataset.subject = []; dataset.strong = [];
 % classifiers
 featureProvidingConstructor = curry(@FeatureProvidingClassifier, ...
-    data, dataSelection);
+    dataset, dataSelection);
 hopConstructor = curry(@HopClassifier, hopSize);
 classifiers = {%ImageProvidingClassifier(data, PixelClassifier()), ...
     %featureProvidingConstructor(HmaxClassifier()), ...
@@ -61,15 +65,16 @@ for iPv = 1:length(percentsVisible)
     fprintf('%d percent visibility\n', percentsVisible(iPv));
     percentBlack = 100 - percentsVisible(iPv);
     dataSelectionSubset = dataSelection(...
-        data.black > percentBlack - visibilityStepSize / 2 & ...
-        data.black <= percentBlack + visibilityStepSize / 2);
+        dataset.black > percentBlack - visibilityStepSize / 2 & ...
+        dataset.black <= percentBlack + visibilityStepSize / 2);
     runner = curry(@evaluate, classifiers);
     classifierResults = crossval(runner, ...
-        dataSelectionSubset', data.truth(dataSelectionSubset), ...
+        dataSelectionSubset', dataset.truth(dataSelectionSubset), ...
         'kfold', kfold)';
     results(iPv, :, :) = cell2mat(classifierResults);
 end
-save(['data/compareOccluded/' ...
-    datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'], ...
-    'percentsVisible', 'results');
+resultsFile = ['data/compareOccluded/' ...
+    datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'];
+save(resultsFile, 'percentsVisible', 'results');
+fprintf('Results stored in ''%s''\n', resultsFile);
 end
