@@ -7,6 +7,7 @@ wholeImages = getWholeImages();
 features = repmat(struct('c2', [], 's2', [], 'c1', [], 's1', []), ...
     length(wholeImages), 1);
 for i = 1:length(wholeImages)
+    fprintf('%d/%d\n', i, length(wholeImages));
     [c2,c1,~,~,s2,s1] = runHmax(wholeImages(i));
     features(i).c2 = c2;
     features(i).c1 = c1;

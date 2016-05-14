@@ -11,6 +11,7 @@ features = repmat(struct('c2', [], 's2', [], 'c1', [], 's1', []), ...
     size(occlusionData, 1), 1);
 featuresIter = 1;
 for dataIter = 1:size(occlusionData, 1)
+    fprintf('%d/%d\n', dataIter, size(occlusionData, 1));
     imageNum = occlusionData.pres(dataIter);
     occludedImage = occlude(wholeImages(imageNum), dataIter, occlusionData);
     [c2,c1,~,~,s2,s1] = runHmax(occludedImage);
