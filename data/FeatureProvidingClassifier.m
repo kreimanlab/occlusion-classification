@@ -91,11 +91,11 @@ classdef FeatureProvidingClassifier < Classifier
                 case 'alexnet-pool5'
                     filePrefix = 'caffenet_pool5_ims_';
                     fileSuffix = '.txt';
-                    loadFeatures = @dlmread;
+                    loadFeatures = @(file) dlmread(file, ' ', 0, 1);
                 case 'alexnet-fc7'
                     filePrefix = 'caffenet_fc7_ims_';
                     fileSuffix = '.txt';
-                    loadFeatures = @dlmread;
+                    loadFeatures = @(file) dlmread(file, ' ', 0, 1);
                 case 'hmax'
                     filePrefix = 'hmax_ims_';
                     fileSuffix = '.mat';
