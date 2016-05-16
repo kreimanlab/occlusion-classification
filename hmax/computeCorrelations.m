@@ -1,10 +1,12 @@
-function computeCorrelations()
+function computeCorrelations(mode)
+if nargin < 1
+    mode = 'diff';
+end
 
 dir = fileparts(mfilename('fullpath'));
 addpath([dir '/../data']);
 featuresDir = [dir '/../data/OcclusionModeling/features'];
 
-mode = 'diff';
 if strcmp(mode, 'diff')
     compareFnc = @(whole, occluded) whole - occluded; % diff
 elseif strcmp(mode, 'occ')
@@ -29,11 +31,12 @@ if ~exist('occludedFeatures', 'var')
     occludedFeatures = occludedFeatures.features(5);
 end
 
-showImages(wholeFeatures.pres, occludedFeatures.row);
-showS1(wholeFeatures.s1{1}, occludedFeatures.s1{1}, compareFnc, mode);
-showC1(wholeFeatures.c1{1}, occludedFeatures.c1{1}, compareFnc, mode);
-showS2(wholeFeatures.s2{1}, occludedFeatures.s2{1}, compareFnc, mode);
-showC2(wholeFeatures.c2, occludedFeatures.c2, compareFnc, mode);
+%showImages(wholeFeatures.pres, occludedFeatures.row);
+%showS1(wholeFeatures.s1{1}, occludedFeatures.s1{1}, compareFnc, mode);
+%showC1(wholeFeatures.c1{1}, occludedFeatures.c1{1}, compareFnc, mode);
+%showS2(wholeFeatures.s2{1}, occludedFeatures.s2{1}, compareFnc, mode);
+%showC2(wholeFeatures.c2, occludedFeatures.c2, compareFnc, mode);
+plotAgainstC2(wholeFeatures.c2, occludedFeatures.c2);
 end
 
 function showS1(wholeS1, occludedS1, compareFnc, modeName)
@@ -117,6 +120,24 @@ end
 lastSubplot = get(subplot(8, 1, 8), 'Position');
 colorbar('Position', [lastSubplot(1)+lastSubplot(3)+0.03, lastSubplot(2), ...
     0.01, lastSubplot(2)+lastSubplot(3)*0.95]);
+end
+
+function plotAgainstC2(wholeC2, occludedC2)
+figure('Name', 'C2 against');
+% c2{iPatchSize}(patchIndices,iImg)
+numPatchSizes = 8;
+for patchSize = 1:numPatchSizes
+    subplot(numPatchSizes / 2, 2, patchSize);
+    [pm, ax] = plotmatrix(wholeC2{patchSize}, occludedC2{patchSize});
+    set(pm, 'MarkerFaceColor', get(pm, 'Color'));
+    set(pm, 'MarkerSize', 10);
+    hold(ax, 'on');
+    plot(ax, wholeC2{patchSize}, wholeC2{patchSize});
+    xlim(ax, [min(wholeC2{patchSize}), max(wholeC2{patchSize})]);
+    ylim(ax, [min(wholeC2{patchSize}), max(wholeC2{patchSize})]);
+    title(sprintf('patchSize %d', patchSize));
+    hold off;
+end
 end
 
 
