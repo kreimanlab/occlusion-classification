@@ -44,11 +44,14 @@ classifiers = cellfun(@(c) hopConstructor(c), classifiers, ...
 for classifierIter = 1:length(classifiers)
     classifier = classifiers{classifierIter};
     % whole
+    fprintf('Classifier %s whole images\n', classifier.getName());
     features = classifier.extractFeatures(uniquePresRows, RunType.Train);
     saveFeatures(features, wholeDir, classifier, 1, 325);
     
     % occluded
     for dataIter = 1:1000:length(dataset)
+        fprintf('Classifier %s occluded %d/%d\n', ...
+            classifier.getName(), dataIter, length(dataset));
         dataEnd = dataIter + 999;
         features = classifier.extractFeatures(dataIter:dataEnd, ...
             RunType.Test);
