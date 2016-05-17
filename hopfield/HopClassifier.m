@@ -6,14 +6,15 @@ classdef HopClassifier < Classifier
     properties
         classifier
         net
-        threshold = 0
-        steps = 10
+        threshold
+        timesteps = 10
         downsampledLength
     end
     
     methods
-        function obj = HopClassifier(downsampledLength, classifier)
+        function obj = HopClassifier(downsampledLength, threshold, classifier)
             obj.downsampledLength = downsampledLength;
+            obj.threshold = threshold;
             obj.classifier = classifier;
         end
         
@@ -38,8 +39,8 @@ classdef HopClassifier < Classifier
         function labels = predict(self, features)
             labels = zeros(size(features, 1), 1);
             for i = 1:size(features, 1)
-                y = self.net({1 self.steps}, {}, {features(i, :)'});
-                T = y{self.steps};
+                y = self.net({1 self.timesteps}, {}, {features(i, :)'});
+                T = y{self.timesteps};
                 labels(i) = self.classifier.predict(T');
             end
         end

@@ -21,7 +21,7 @@ featuresDir = 'data/OcclusionModeling/features';
 wholeDir = [featuresDir '/klab325_orig'];
 occlusionDir = [featuresDir '/data_occlusion_klab325v2'];
 % data
-dataset = load('data_occlusion_klab325v2.mat');
+dataset = load('data/data_occlusion_klab325v2.mat');
 dataset = dataset.data;
 dataset.occluded = []; % delete unneeded columns to free up space
 dataset.scramble = []; dataset.pres_time = []; dataset.reaction_times = [];
@@ -31,13 +31,11 @@ dataset.masked = []; dataset.subject = []; dataset.strong = [];
 featureProvidingConstructor = curry(@FeatureProvidingClassifier, ...
     dataset, 1:length(dataset));
 hopConstructor = curry(@HopClassifier, hopSize);
-classifiers = {ImageProvidingClassifier(dataset, PixelClassifier()), ...
-    featureProvidingConstructor(HmaxClassifier()), ...
-    featureProvidingConstructor(AlexnetPool5ClassifierKlabData()), ...
-    featureProvidingConstructor(AlexnetFc7ClassifierKlabData())
+classifiers = {hopConstructor(0, ImageProvidingClassifier(dataset, PixelClassifier())), ...
+    hopConstructor(0.8, featureProvidingConstructor(HmaxClassifier())), ...
+    hopConstructor(0, featureProvidingConstructor(AlexnetPool5ClassifierKlabData())), ...
+    hopConstructor(0, featureProvidingConstructor(AlexnetFc7ClassifierKlabData()))
     };
-classifiers = cellfun(@(c) hopConstructor(c), classifiers, ...
-    'UniformOutput', false);
 
 %% Run
 [~, uniquePresRows] = unique(dataset, 'pres');
