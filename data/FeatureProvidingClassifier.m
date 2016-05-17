@@ -27,12 +27,7 @@ classdef FeatureProvidingClassifier < Classifier
         
         function name = getName(self)
             name = self.classifier.getName();
-            switch name
-                case 'alexnet-fc7' 
-                    name = 'caffenet_fc7';
-                case 'alexnet-pool5'
-                    name = 'caffenet_pool5';
-            end
+            name = strrep(name, 'alexnet-', 'caffenet_');
         end
         
         function fit(self, features, labels)
@@ -86,7 +81,7 @@ classdef FeatureProvidingClassifier < Classifier
             end
         end
         
-        function features = loadHmax(~, filePath)
+        function features = loadMat(~, filePath)
             data = load(filePath);
             features = data.features;
         end
@@ -105,7 +100,23 @@ classdef FeatureProvidingClassifier < Classifier
                 case 'hmax'
                     filePrefix = 'hmax_ims_';
                     fileSuffix = '.mat';
-                    loadFeatures = @self.loadHmax;
+                    loadFeatures = @self.loadMat;
+                case 'pixels-hop'
+                    filePrefix = 'pixels-hop993_';
+                    fileSuffix = '.mat';
+                    loadFeatures = @self.loadMat;
+                case 'alexnet-pool5-hop'
+                    filePrefix = 'caffenet_pool5-hop922_';
+                    fileSuffix = '.mat';
+                    loadFeatures = @self.loadMat;
+                case 'alexnet-fc7-hop'
+                    filePrefix = 'caffenet_fc7-hop820_';
+                    fileSuffix = '.mat';
+                    loadFeatures = @self.loadMat;
+                case 'hmax-hop'
+                    filePrefix = 'hmax-hop1000_';
+                    fileSuffix = '.mat';
+                    loadFeatures = @self.loadMat;
                 otherwise
                     error(['Unknown classifier ' classifier.getName()]);
             end
