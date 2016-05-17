@@ -27,6 +27,12 @@ classdef FeatureProvidingClassifier < Classifier
         
         function name = getName(self)
             name = self.classifier.getName();
+            switch name
+                case 'alexnet-fc7' 
+                    name = 'caffenet_fc7';
+                case 'alexnet-pool5'
+                    name = 'caffenet_pool5';
+            end
         end
         
         function fit(self, features, labels)
