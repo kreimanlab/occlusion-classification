@@ -59,8 +59,7 @@ end
 end
 
 function saveFeatures(features, dir, classifier, dataMin, dataMax)
-actualHopSize = size(features, 2);
-save([dir '/' classifier.getName() num2str(actualHopSize) '_' ...
+save([dir '/' classifier.getName() '_' ...
     num2str(dataMin) '-' num2str(dataMax) '.mat'], ...
     '-v7.3', 'features');
 end
