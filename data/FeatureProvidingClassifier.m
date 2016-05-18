@@ -130,7 +130,7 @@ classdef FeatureProvidingClassifier < Classifier
                         error(['Unknown classifier ' classifier.getName()]);
                     end
                     
-                    filePrefix = strrep(name, 'alexnet-', 'caffenet_');
+                    filePrefix = [strrep(name, 'alexnet-', 'caffenet_') '_'];
                     fileSuffix = '.mat';
                     loadFeatures = @self.loadMat;
             end
