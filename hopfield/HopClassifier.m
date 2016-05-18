@@ -19,7 +19,8 @@ classdef HopClassifier < Classifier
         end
         
         function name = getName(self)
-            name = [self.classifier.getName() '-hop'];
+            name = [self.classifier.getName() '-hop'...
+                '-threshold' num2str(self.threshold)];
         end
         
         function features = extractFeatures(self, images, runType)

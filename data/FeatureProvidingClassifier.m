@@ -105,11 +105,11 @@ classdef FeatureProvidingClassifier < Classifier
                     filePrefix = 'pixels-hop993_';
                     fileSuffix = '.mat';
                     loadFeatures = @self.loadMat;
-                case 'alexnet-pool5-hop'
+                case {'alexnet-pool5-hop', 'caffenet_pool5-hop'}
                     filePrefix = 'caffenet_pool5-hop922_';
                     fileSuffix = '.mat';
                     loadFeatures = @self.loadMat;
-                case 'alexnet-fc7-hop'
+                case {'alexnet-fc7-hop', 'caffenet_fc7-hop'}
                     filePrefix = 'caffenet_fc7-hop820_';
                     fileSuffix = '.mat';
                     loadFeatures = @self.loadMat;
