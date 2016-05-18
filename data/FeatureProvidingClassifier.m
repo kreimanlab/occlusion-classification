@@ -88,7 +88,8 @@ classdef FeatureProvidingClassifier < Classifier
         
         function [filePrefix, fileSuffix, loadFeatures] = ...
                 getFileDirectives(self, classifier)
-            switch(classifier.getName())
+            name = self.classifier.getName();
+            switch(name)
                 case 'alexnet-pool5'
                     filePrefix = 'caffenet_pool5_ims_';
                     fileSuffix = '.txt';
@@ -118,7 +119,20 @@ classdef FeatureProvidingClassifier < Classifier
                     fileSuffix = '.mat';
                     loadFeatures = @self.loadMat;
                 otherwise
-                    error(['Unknown classifier ' classifier.getName()]);
+                    if ~regexp(name, ...
+                            ['^('...
+                            '(pixels)'...
+                            '|(((alexnet)|(caffenet))(\-|_)((pool5)|(fc7)))'...
+                            '|(hmax)'...
+                            ')'...
+                            '\-hop\-threshold[0-9]+(\.[0-9]+)?'...
+                            '$'])
+                        error(['Unknown classifier ' classifier.getName()]);
+                    end
+                    
+                    filePrefix = strrep(name, 'alexnet-', 'caffenet_');
+                    fileSuffix = '.mat';
+                    loadFeatures = @self.loadMat;
             end
         end
     end
