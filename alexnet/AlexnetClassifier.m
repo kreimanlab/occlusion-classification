@@ -7,7 +7,6 @@ classdef AlexnetClassifier < Classifier
         featuresLength
         netParams
         imagesMean
-        classifier
     end
     
     methods
@@ -21,16 +20,6 @@ classdef AlexnetClassifier < Classifier
             obj.imagesMean = imagesMeanData.mean_data;
         end
         
-        function fit(self, features, labels)
-            self.classifier = fitcecoc(features,labels);
-        end
-        
-        function labels = predict(self, features)
-            labels = self.classifier.predict(...
-                reshape(features, [size(features, 1), ...
-                numel(features) / size(features, 1)]));
-        end
-        
         function features = extractFeatures(self, images)
             features = zeros(length(images), self.featuresLength);
             for img=1:length(images)
@@ -38,6 +27,8 @@ classdef AlexnetClassifier < Classifier
                 imageFeatures = self.getImageFeatures(preparedImage);
                 features(img, :) = imageFeatures(:);
             end
+            features = reshape(features, [size(features, 1), ...
+                numel(features) / size(features, 1)]);
         end
     end
     

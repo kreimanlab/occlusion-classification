@@ -2,18 +2,17 @@ classdef FeatureProvidingClassifier < Classifier
     % Classifier that retrieves the features from previous runs.
     
     properties
-        classifier
+        providedClassifier
         caches
-        loadFeatures
     end
     
     methods
         function self = FeatureProvidingClassifier(...
-                occlusionData, dataSelection, classifier)
-            self.classifier = classifier;
+                occlusionData, dataSelection, providedClassifier)
+            self.providedClassifier = providedClassifier;
             dir = './data/OcclusionModeling/features/';
             [filePrefix, fileSuffix, loadFeatures] = ...
-                self.getFileDirectives(classifier);
+                self.getFileDirectives(providedClassifier);
             self.caches = containers.Map(...
                 {char(RunType.Train), char(RunType.Test)}, ...
                 {self.createWholeCache(...
@@ -26,16 +25,16 @@ classdef FeatureProvidingClassifier < Classifier
         end
         
         function name = getName(self)
-            name = self.classifier.getName();
+            name = self.providedClassifier.getName();
             name = strrep(name, 'alexnet-', 'caffenet_');
         end
         
         function fit(self, features, labels)
-            self.classifier.fit(features,labels);
+            self.providedClassifier.fit(features,labels);
         end
         
         function labels = predict(self, features)
-            labels = self.classifier.predict(features);
+            labels = self.providedClassifier.predict(features);
         end
         
         function features = extractFeatures(self, ids, runType)
@@ -87,8 +86,8 @@ classdef FeatureProvidingClassifier < Classifier
         end
         
         function [filePrefix, fileSuffix, loadFeatures] = ...
-                getFileDirectives(self, classifier)
-            name = self.classifier.getName();
+                getFileDirectives(self, providedClassifier)
+            name = self.providedClassifier.getName();
             switch(name)
                 case 'alexnet-pool5'
                     filePrefix = 'caffenet_pool5_ims_';
@@ -102,32 +101,16 @@ classdef FeatureProvidingClassifier < Classifier
                     filePrefix = 'hmax_ims_';
                     fileSuffix = '.mat';
                     loadFeatures = @self.loadMat;
-                case 'pixels-hop'
-                    filePrefix = 'pixels-hop993_';
-                    fileSuffix = '.mat';
-                    loadFeatures = @self.loadMat;
-                case {'alexnet-pool5-hop', 'caffenet_pool5-hop'}
-                    filePrefix = 'caffenet_pool5-hop922_';
-                    fileSuffix = '.mat';
-                    loadFeatures = @self.loadMat;
-                case {'alexnet-fc7-hop', 'caffenet_fc7-hop'}
-                    filePrefix = 'caffenet_fc7-hop820_';
-                    fileSuffix = '.mat';
-                    loadFeatures = @self.loadMat;
-                case 'hmax-hop'
-                    filePrefix = 'hmax-hop1000_';
-                    fileSuffix = '.mat';
-                    loadFeatures = @self.loadMat;
                 otherwise
-                    if ~regexp(name, ...
+                    if isempty(regexp(name, ...
                             ['^('...
                             '(pixels)'...
                             '|(((alexnet)|(caffenet))(\-|_)((pool5)|(fc7)))'...
                             '|(hmax)'...
                             ')'...
                             '\-hop\-threshold[0-9]+(\.[0-9]+)?'...
-                            '$'])
-                        error(['Unknown classifier ' classifier.getName()]);
+                            '$']))
+                        error(['Unknown classifier ' providedClassifier.getName()]);
                     end
                     
                     filePrefix = [strrep(name, 'alexnet-', 'caffenet_') '_'];

@@ -4,7 +4,7 @@ classdef HopClassifier < Classifier
     % Utilizes a Hopfield attractor network.
     
     properties
-        classifier
+        featureClassifier
         net
         threshold
         timesteps = 10
@@ -12,19 +12,19 @@ classdef HopClassifier < Classifier
     end
     
     methods
-        function obj = HopClassifier(downsampledLength, threshold, classifier)
+        function obj = HopClassifier(downsampledLength, threshold, featureClassifier)
             obj.downsampledLength = downsampledLength;
             obj.threshold = threshold;
-            obj.classifier = classifier;
+            obj.featureClassifier = featureClassifier;
         end
         
         function name = getName(self)
-            name = [self.classifier.getName() '-hop'...
+            name = [self.featureClassifier.getName() '-hop'...
                 '-threshold' num2str(self.threshold)];
         end
         
         function features = extractFeatures(self, images, runType)
-            T = self.classifier.extractFeatures(images, runType);
+            T = self.featureClassifier.extractFeatures(images, runType);
             T = self.downsample(T);
             T(T > self.threshold) = 1;
             T(T <= self.threshold) = -1;
@@ -34,7 +34,7 @@ classdef HopClassifier < Classifier
         function fit(self, features, labels)
             T = features';
             self.net = newhop(T);
-            self.classifier.fit(T', labels);
+            self.featureClassifier.fit(T', labels);
         end
         
         function labels = predict(self, features)
@@ -42,7 +42,7 @@ classdef HopClassifier < Classifier
             for i = 1:size(features, 1)
                 y = self.net({1 self.timesteps}, {}, {features(i, :)'});
                 T = y{self.timesteps};
-                labels(i) = self.classifier.predict(T');
+                labels(i) = self.featureClassifier.predict(T');
             end
         end
     end
