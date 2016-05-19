@@ -1,11 +1,5 @@
 
-addpath('./data');
-addpath('./pixel');
-addpath('./hmax');
-addpath('./alexnet');
-addpath('./hopfield');
-addpath('./visualize');
-addpath(genpath('./helper'));
+addpath(genpath(pwd));
 
 % data
 dataset = load('data/data_occlusion_klab325v2.mat');
@@ -15,13 +9,11 @@ dataset.scramble = []; dataset.pres_time = []; dataset.reaction_times = [];
 dataset.responses = []; dataset.correct = []; dataset.VBLsoa = [];
 dataset.masked = []; dataset.subject = []; dataset.strong = [];
 % selection
-[~, uniquePresRows] = unique(dataset, 'pres');
-rng(1, 'twister'); % seed for reproducibility
-occludedRows = 1:100;%randsample(length(dataset), 100);
-occludedRows = unique([occludedRows'; uniquePresRows]');
+[~, rows] = unique(dataset.pres(:)); % pick one version of each object
+rows = rows';
 % classifiers
 featureProvidingConstructor = curry(@FeatureProvidingClassifier, ...
-    dataset, occludedRows);
+    dataset, rows);
 hopConstructor = curry(@HopClassifier, 1000);
 classifiers = {...
     ...% pixels
@@ -38,7 +30,7 @@ classifiers = {...
     featureProvidingConstructor(hopConstructor(0, AlexnetFc7ClassifierKlabData()))...
     };
 
-colors = ['r', 'g', 'b', 'y', 'm'];
+colors = ['r', 'b', 'g', 'y', 'm'];
 numDim = 2;
 numRows = nchoosek(numDim, 2);
 for classifierIter = 1:length(classifiers)
@@ -53,23 +45,22 @@ for classifierIter = 1:length(classifiers)
     % show without and with hop
     for hopIter = 1:2
         classifier = classifiers{classifierIter, hopIter};
-        wholeFeatures = classifier.extractFeatures(uniquePresRows, RunType.Train);
-        wholeLabels = dataset.truth(uniquePresRows);
-        occludedFeatures = classifier.extractFeatures(occludedRows, RunType.Test);
-        occludedLabels = dataset.truth(occludedRows);
+        wholeFeatures = classifier.extractFeatures(rows, RunType.Train);
+        occludedFeatures = classifier.extractFeatures(rows, RunType.Test);
+        labels = dataset.truth(rows);
         mappedX = tsne([wholeFeatures', occludedFeatures']', [], numDim);
         mappedXWhole = mappedX(1:size(wholeFeatures, 1), :);
         mappedXOccluded = mappedX(size(wholeFeatures, 1) + 1:end, :);
-        % plot x,y[;y,z;z,x etc]
+        % plot x,y[;y,z;z,x]
         for dimX = 1:numRows
             ax = subplot(numRows, 2, hopIter + (dimX - 1) * 2);
             set(gca, 'XTickLabel', ''); set(gca, 'YTickLabel', '');
             hold(ax, 'on');
             dimY = mod(dimX, numDim) + 1;
             gscatter(mappedXWhole(:,dimX), mappedXWhole(:,dimY), ...
-                stringifyLabels(wholeLabels), colors, 'o', [], false);
+                stringifyLabels(labels), colors, 'o', [], false);
             gscatter(mappedXOccluded(:,dimX), mappedXOccluded(:,dimY), ...
-                stringifyLabels(occludedLabels), colors, '.', [], false);
+                stringifyLabels(labels), colors, '.', [], false);
             hold off;
         end
     end
