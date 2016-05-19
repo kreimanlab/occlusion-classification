@@ -2,6 +2,8 @@ function displayResults(percentsVisible, results)
 
 accuracies = 100 * reshape([results.accuracy], size(results));
 meanValues = mean(accuracies, 3);
+standardErrorOfTheMean = std(accuracies, 0, 3) / ...
+    sqrt(size(accuracies, 3));
 figure();
 % rotate to properly display on pdf
 orient portrait;
@@ -12,7 +14,7 @@ hold on;
 xlim([min(percentsVisible)-3, max(percentsVisible)+8]);
 ylim([0 100]);
 errorbar(permute(repmat(percentsVisible, size(results, 2), 1), [2 1]), ...
-    meanValues, std(accuracies, 0, 3), 'o-');
+    meanValues, standardErrorOfTheMean, 'o-');
 plot(get(gca,'xlim'), [20 20], '--k');
 xlabel('Percent Visible');
 ylabel('Performance');
