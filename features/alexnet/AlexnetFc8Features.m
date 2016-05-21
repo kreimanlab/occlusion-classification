@@ -1,11 +1,10 @@
-classdef AlexnetFc8Classifier < AlexnetClassifier
-    % Classifier based on Alexnet feature-extraction.
-    % Uses a linear classifier on top of the Alexnet fc8 output.
+classdef AlexnetFc8Features < AlexnetFeatures
+    % Extract Alexnet fc8 features
     
     methods
-        function obj = AlexnetFc8Classifier()
+        function obj = AlexnetFc8Features()
             fc8OutputLength = 1000;
-            obj = obj@AlexnetClassifier(fc8OutputLength);
+            obj = obj@AlexnetFeatures(fc8OutputLength);
         end
         
         function name = getName(~)

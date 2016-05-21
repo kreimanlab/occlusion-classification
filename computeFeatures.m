@@ -8,13 +8,7 @@ argParser.parse(varargin{:});
 hopSize = argParser.Results.hopSize;
 fprintf('Running with args (hopSize=%d)\n', hopSize);
 
-addpath('./data');
-addpath('./pixel');
-addpath('./hmax');
-addpath('./alexnet');
-addpath('./hopfield');
-addpath('./visualize');
-addpath(genpath('./helper'));
+addpath(genpath(pwd));
 
 %% Setup
 featuresDir = 'data/OcclusionModeling/features';
@@ -28,32 +22,33 @@ dataset.scramble = []; dataset.pres_time = []; dataset.reaction_times = [];
 dataset.responses = []; dataset.correct = []; dataset.VBLsoa = [];
 dataset.masked = []; dataset.subject = []; dataset.strong = [];
 % classifiers
-featureProvidingConstructor = curry(@FeatureProvidingClassifier, ...
-    dataset, 1:length(dataset));
-hopConstructor = curry(@HopClassifier, hopSize);
-classifiers = {hopConstructor(0, ImageProvidingClassifier(dataset, PixelClassifier())), ...
-    hopConstructor(0.8, featureProvidingConstructor(HmaxClassifier())), ...
-    hopConstructor(0, featureProvidingConstructor(AlexnetPool5ClassifierKlabData())), ...
-    hopConstructor(0, featureProvidingConstructor(AlexnetFc7ClassifierKlabData()))
+featureProvider = curry(@FeatureProvider, dataset, 1:length(dataset));
+hop = curry(@HopFeatures, hopSize);
+featureExtractors = {...
+    hop(0, ImageProvider(dataset, PixelFeatures())), ...
+    hop(0.8, featureProvider(HmaxFeatures())), ...
+    hop(0, featureProvider(AlexnetPool5FeaturesKlabData())), ...
+    hop(0, featureProvider(AlexnetFc7FeaturesKlabData()))
     };
 
 %% Run
 [~, uniquePresRows] = unique(dataset, 'pres');
-for classifierIter = 1:length(classifiers)
-    classifier = classifiers{classifierIter};
+for featureExtractorIter = 1:length(featureExtractors)
+    featureExtractor = featureExtractors{featureExtractorIter};
     % whole
-    fprintf('Classifier %s whole images\n', classifier.getName());
-    features = classifier.extractFeatures(uniquePresRows, RunType.Train);
-    saveFeatures(features, wholeDir, classifier, 1, 325);
+    fprintf('%s whole images\n', featureExtractor.getName());
+    features = featureExtractor.extractFeatures(uniquePresRows, RunType.Train);
+    saveFeatures(features, wholeDir, featureExtractor, 1, 325);
     
     % occluded
     for dataIter = 1:1000:length(dataset)
-        fprintf('Classifier %s occluded %d/%d\n', ...
-            classifier.getName(), dataIter, length(dataset));
+        fprintf('%s occluded %d/%d\n', featureExtractor.getName(), ...
+            dataIter, length(dataset));
         dataEnd = dataIter + 999;
-        features = classifier.extractFeatures(dataIter:dataEnd, ...
+        features = featureExtractor.extractFeatures(dataIter:dataEnd, ...
             RunType.Test);
-        saveFeatures(features, occlusionDir, classifier, dataIter, dataEnd);
+        saveFeatures(features, occlusionDir, ...
+            featureExtractor, dataIter, dataEnd);
     end
 end
 end

@@ -1,7 +1,5 @@
-classdef AlexnetClassifier < Classifier
-    % Classifier based on Alexnet feature-extraction.
-    % Uses a linear classifier on top of the output of one of the Alexnet
-    % layers.
+classdef AlexnetFeatures < FeatureExtractor
+    % Extract Alexnet features
     
     properties
         featuresLength
@@ -10,7 +8,7 @@ classdef AlexnetClassifier < Classifier
     end
     
     methods
-        function obj = AlexnetClassifier(featuresLength)
+        function obj = AlexnetFeatures(featuresLength)
             obj.featuresLength = featuresLength;
             
             dir = fileparts(mfilename('fullpath'));
@@ -20,7 +18,7 @@ classdef AlexnetClassifier < Classifier
             obj.imagesMean = imagesMeanData.mean_data;
         end
         
-        function features = extractFeatures(self, images)
+        function features = extractFeatures(self, images, ~)
             features = zeros(length(images), self.featuresLength);
             for img=1:length(images)
                 preparedImage = prepareGrayscaleImage(images{img}, self.imagesMean);

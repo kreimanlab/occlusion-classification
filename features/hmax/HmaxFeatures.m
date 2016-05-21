@@ -1,9 +1,8 @@
-classdef HmaxClassifier < Classifier
-    % Classifier based on HMAX feature-extraction
-    % Uses a linear classifier on top of the HMAX features
+classdef HmaxFeatures < FeatureExtractor
+    % Extracts features using HMAX.
     
     methods
-        function obj = HmaxClassifier()
+        function obj = HmaxFeatures()
         end
         
         function name = getName(~)

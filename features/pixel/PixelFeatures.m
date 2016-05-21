@@ -1,8 +1,8 @@
-classdef PixelClassifier < Classifier
-    % Classifier based on pixels only
+classdef PixelFeatures < FeatureExtractor
+    % Extracts a raw pixel vector
     
     methods
-        function obj = PixelClassifier()
+        function obj = PixelFeatures()
         end
         
         function name = getName(~)

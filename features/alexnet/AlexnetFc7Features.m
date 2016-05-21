@@ -1,11 +1,10 @@
-classdef AlexnetFc7Classifier < AlexnetClassifier
-    % Classifier based on Alexnet feature-extraction.
-    % Uses a linear classifier on top of the Alexnet fc7 output.
+classdef AlexnetFc7Features < AlexnetFeatures
+    % Extract Alexnet fc7 features
     
     methods
-        function obj = AlexnetFc7Classifier()
+        function obj = AlexnetFc7Features()
             fc7OutputLength = 4096;
-            obj = obj@AlexnetClassifier(fc7OutputLength);
+            obj = obj@AlexnetFeatures(fc7OutputLength);
         end
         
         function name = getName(~)

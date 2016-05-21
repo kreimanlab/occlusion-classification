@@ -1,18 +1,18 @@
-classdef FeatureProvidingClassifier < Classifier
+classdef FeatureProvider < FeatureExtractor
     % Classifier that retrieves the features from previous runs.
     
     properties
-        providedClassifier
+        originalExtractor
         caches
     end
     
     methods
-        function self = FeatureProvidingClassifier(...
-                occlusionData, dataSelection, providedClassifier)
-            self.providedClassifier = providedClassifier;
+        function self = FeatureProvider(...
+                occlusionData, dataSelection, originalExtractor)
+            self.originalExtractor = originalExtractor;
             dir = './data/OcclusionModeling/features/';
             [filePrefix, fileSuffix, loadFeatures] = ...
-                self.getFileDirectives(providedClassifier);
+                self.getFileDirectives(originalExtractor);
             self.caches = containers.Map(...
                 {char(RunType.Train), char(RunType.Test)}, ...
                 {self.createWholeCache(...
@@ -25,16 +25,8 @@ classdef FeatureProvidingClassifier < Classifier
         end
         
         function name = getName(self)
-            name = self.providedClassifier.getName();
+            name = self.originalExtractor.getName();
             name = strrep(name, 'alexnet-', 'caffenet_');
-        end
-        
-        function fit(self, features, labels)
-            self.providedClassifier.fit(features,labels);
-        end
-        
-        function labels = predict(self, features)
-            labels = self.providedClassifier.predict(features);
         end
         
         function features = extractFeatures(self, ids, runType)
@@ -86,8 +78,8 @@ classdef FeatureProvidingClassifier < Classifier
         end
         
         function [filePrefix, fileSuffix, loadFeatures] = ...
-                getFileDirectives(self, providedClassifier)
-            name = self.providedClassifier.getName();
+                getFileDirectives(self, originalExtractor)
+            name = self.originalExtractor.getName();
             switch(name)
                 case 'alexnet-pool5'
                     filePrefix = 'caffenet_pool5_ims_';
@@ -109,8 +101,8 @@ classdef FeatureProvidingClassifier < Classifier
                             '|(hmax)'...
                             ')'...
                             '\-hop\-threshold[0-9]+(\.[0-9]+)?'...
-                            '$']))
-                        error(['Unknown classifier ' providedClassifier.getName()]);
+                            '$'], 'once'))
+                        error(['Unknown classifier ' originalExtractor.getName()]);
                     end
                     
                     filePrefix = [strrep(name, 'alexnet-', 'caffenet_') '_'];

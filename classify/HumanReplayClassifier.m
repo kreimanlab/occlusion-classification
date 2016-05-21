@@ -7,6 +7,7 @@ classdef HumanReplayClassifier < Classifier
     
     methods
         function obj = HumanReplayClassifier(dataset)
+            obj@Classifier([]);
             obj.dataset = dataset;
         end
         
@@ -14,15 +15,17 @@ classdef HumanReplayClassifier < Classifier
             name = 'human';
         end
         
-        function features = extractFeatures(~, rows, ~)
-            features = rows;
+        function train(~, ~, ~)
+        end
+        
+        function labels = predict(self, rows)
+            labels = self.dataset.response_category(rows);
         end
         
         function fit(~, ~, ~)
         end
         
-        function labels = predict(self, rows)
-            labels = self.dataset.response_category(rows);
+        function classify(~, ~)
         end
     end
 end

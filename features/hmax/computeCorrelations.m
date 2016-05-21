@@ -36,7 +36,17 @@ end
 %showC1(wholeFeatures.c1{1}, occludedFeatures.c1{1}, compareFnc, mode);
 %showS2(wholeFeatures.s2{1}, occludedFeatures.s2{1}, compareFnc, mode);
 %showC2(wholeFeatures.c2, occludedFeatures.c2, compareFnc, mode);
-plotAgainstC2(wholeFeatures.c2, occludedFeatures.c2);
+
+occlusionData = load('data/data_occlusion_klab325v2.mat');
+occlusionData = occlusionData.data;
+for i=1:5
+    % TODO: pick two patch sizes, plot all occlusions in one figure
+    row = occludedFeatures(i).row;
+    occlusion = occlusionData.black(row);
+    occludedC2 = occludedFeatures(i).c2;
+    plotAgainstC2(wholeFeatures.c2, occludedC2, ...
+        sprintf('(%.2f%% occlusion)', occlusion));
+end
 end
 
 function showS1(wholeS1, occludedS1, compareFnc, modeName)
@@ -122,8 +132,8 @@ colorbar('Position', [lastSubplot(1)+lastSubplot(3)+0.03, lastSubplot(2), ...
     0.01, lastSubplot(2)+lastSubplot(3)*0.95]);
 end
 
-function plotAgainstC2(wholeC2, occludedC2)
-figure('Name', 'C2 against');
+function plotAgainstC2(wholeC2, occludedC2, titleDetails)
+figure('Name', ['C2 ' titleDetails]);
 % c2{iPatchSize}(patchIndices,iImg)
 numPatchSizes = 8;
 for patchSize = 1:numPatchSizes
