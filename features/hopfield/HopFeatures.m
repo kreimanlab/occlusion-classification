@@ -20,7 +20,7 @@ classdef HopFeatures < FeatureExtractor
         
         function name = getName(self)
             name = [self.featuresInput.getName() '-hop'...
-                '-threshold' num2str(self.threshold)];
+                '_threshold' num2str(self.threshold)];
         end
         
         function features = extractFeatures(self, images, runType)
