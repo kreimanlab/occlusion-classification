@@ -42,7 +42,7 @@ featureExtractors = {...
     RnnFeatureProvider(dataset, RnnFeatures())...
     };
 classifiers = cellfun(@(featureExtractor) ...
-    LibsvmClassifier(featureExtractor), ...
+    SvmClassifier(featureExtractor), ...
     featureExtractors, 'UniformOutput', false);
 % cross validation
 rng(1, 'twister'); % seed, use pseudo random generator for reproducibility
@@ -50,7 +50,7 @@ rng(1, 'twister'); % seed, use pseudo random generator for reproducibility
 %% Run
 percentsVisible = 0:visibilityStepSize:35;
 [~, trainX] = unique(dataset.pres(:));
-trainY = dataset.truth(trainX);
+trainY = dataset.pres(trainX);
 results = repmat(struct('name', [], 'predicted', [], 'real', [], ...
     'matched', [], 'accuracy', []), ... % need to pre-allocate array
     length(percentsVisible), length(classifiers));
@@ -64,7 +64,7 @@ for iClassifier = 1:length(classifiers)
         testX = dataSelection(...
             dataset.black >  percentBlack - visibilityStepSize / 2 & ...
             dataset.black <= percentBlack + visibilityStepSize / 2);
-        testY = dataset.truth(testX);
+        testY = dataset.pres(testX);
         fprintf('Testing %s...\n', classifier.getName());
         predictedY = classifier.predict(testX);
         
