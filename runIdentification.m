@@ -73,8 +73,8 @@ for iClassifier = 1:length(classifiers)
             'predicted', predictedY, 'real', testY,...
             'matched', matched, 'accuracy', accuracy);
     end
-    resultsFile = ['data/compareOccluded/' ...
-        datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'];
-    save(resultsFile, 'percentsVisible', 'results');
-    fprintf('Results stored in ''%s''\n', resultsFile);
 end
+resultsFile = ['data/compareOccluded/' ...
+    datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'];
+save(resultsFile, 'percentsVisible', 'results');
+fprintf('Results stored in ''%s''\n', resultsFile);
