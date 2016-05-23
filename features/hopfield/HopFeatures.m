@@ -1,48 +1,48 @@
 classdef HopFeatures < FeatureExtractor
-    % Feature extractor with an attractor network on top of other features.
-    % Utilizes a Hopfield attractor network.
+    % Attachment for another feature extractor to post-processes the
+    % features with a hopfield network.
+    % Initializes itself with the first test dataset.
     
     properties
         featuresInput
         net
-        threshold
+        netTrained
         timesteps = 10
         downsampledLength
     end
     
     methods
-        function obj = HopFeatures(downsampledLength, threshold, ...
-                featuresInput)
+        function obj = HopFeatures(downsampledLength, featuresInput)
             obj.downsampledLength = downsampledLength;
-            obj.threshold = threshold;
             obj.featuresInput = featuresInput;
+            obj.netTrained = false;
         end
         
         function name = getName(self)
-            name = [self.featuresInput.getName() '-hop'...
-                '_threshold' num2str(self.threshold)];
+            name = [self.featuresInput.getName() '-hop'];
         end
         
-        function features = extractFeatures(self, images, runType)
-            T = self.featuresInput.extractFeatures(images, runType);
-            T = self.downsample(T);
-            T(T > self.threshold) = 1;
-            T(T <= self.threshold) = -1;
-            features = T;
-        end
-        
-        function fit(self, features, labels)
-            T = features';
-            self.net = newhop(T);
-            self.featuresInput.fit(T', labels);
-        end
-        
-        function labels = predict(self, features)
-            labels = zeros(size(features, 1), 1);
-            for i = 1:size(features, 1)
-                y = self.net({1 self.timesteps}, {}, {features(i, :)'});
-                T = y{self.timesteps};
-                labels(i) = self.featuresInput.predict(T');
+        function features = extractFeatures(self, rows, runType)
+            previousFeatures = self.featuresInput.extractFeatures(rows, runType);
+            previousFeatures = self.downsample(previousFeatures);
+            if runType == RunType.Train
+                % train network
+                T = previousFeatures';
+                self.net = newhop(T);
+                self.netTrained = true;
+                features = T';
+            elseif runType == RunType.Test
+                if ~self.netTrained
+                    error('net was not trained yet');
+                end
+                % retrieve from network
+                features = zeros(size(previousFeatures));
+                for i = 1:size(features, 1)
+                    y = self.net({1 self.timesteps}, {}, ...
+                        {previousFeatures(i, :)'});
+                    T = y{self.timesteps};
+                    features(i,:) = T';
+                end
             end
         end
     end
