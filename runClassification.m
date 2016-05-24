@@ -1,10 +1,10 @@
-function compareClassifiers(varargin)
+function runClassification(varargin)
 
 %% Parameters
 argParser = inputParser();
 argParser.KeepUnmatched = true;
 argParser.addOptional('dataMin', 1, @isnumeric);
-argParser.addOptional('dataMax', 1000, @isnumeric);
+argParser.addOptional('dataMax', 12600, @isnumeric);
 argParser.addOptional('kfold', 5, @isnumeric);
 argParser.addOptional('visibilityStepSize', 15, @isnumeric);
 argParser.addOptional('hopSize', 1000, @isnumeric);
@@ -23,13 +23,10 @@ addpath(genpath(pwd));
 %% Setup
 % data
 dataset = load('data_occlusion_klab325v2.mat');
-dataset = dataset.data;
+dataset = dataset.data(dataset.data.pres <= 300, :);
 dataSelection = dataMin:dataMax;
 dataset = dataset(dataSelection, :);
-dataset.occluded = []; % delete unneeded columns to free up space
-dataset.scramble = []; dataset.pres_time = []; dataset.reaction_times = [];
-dataset.responses = []; dataset.correct = []; dataset.VBLsoa = [];
-dataset.masked = []; dataset.subject = []; dataset.strong = [];
+wholeImagePres = unique(dataset.pres(:));
 % feature extractors + classifier
 featureProvider = curry(@FeatureProvider, dataset, dataSelection);
 hop = curry(@HopFeatures, hopSize);
@@ -38,9 +35,9 @@ featureExtractors = {...
     featureProvider(HmaxFeatures()), ...
     featureProvider(AlexnetPool5FeaturesKlabData()), ...
     featureProvider(AlexnetFc7FeaturesKlabData()), ...
-    hop(featureProvider(BipolarFeatures(0.01, HmaxFeatures()))), ...
-    hop(featureProvider(BipolarFeatures(0, AlexnetPool5FeaturesKlabData()))), ...
-    hop(featureProvider(BipolarFeatures(0, AlexnetFc7FeaturesKlabData()))), ...
+    hop(BipolarFeatures(0.01, featureProvider(HmaxFeatures()))), ...
+    hop(BipolarFeatures(0, featureProvider(AlexnetPool5FeaturesKlabData()))), ...
+    hop(BipolarFeatures(0, featureProvider(AlexnetFc7FeaturesKlabData()))), ...
     RnnFeatureProvider(dataset, RnnFeatures())...
     };
 classifiers = cellfun(@(featureExtractor) SvmClassifier(featureExtractor), ...
@@ -51,23 +48,13 @@ rng(1, 'twister'); % seed, use pseudo random generator for reproducibility
 
 %% Run
 percentsVisible = 0:visibilityStepSize:35;
-results = repmat(struct('name', [], 'predicted', [], 'real', [], ...
-    'matched', [], 'accuracy', []), ... % need to pre-allocate array
-    length(percentsVisible), length(classifiers), kfold);
-for iPv = 1:length(percentsVisible)
-    fprintf('%d percent visibility\n', percentsVisible(iPv));
-    percentBlack = 100 - percentsVisible(iPv);
-    dataSelectionSubset = dataSelection(...
-        dataset.black >  percentBlack - visibilityStepSize / 2 & ...
-        dataset.black <= percentBlack + visibilityStepSize / 2);
-    labels = dataset.truth(dataSelectionSubset);
-    runner = curry(@evaluate, classifiers);
-    currentResults = crossval(runner, ...
-        dataSelectionSubset', labels, ...
-        'kfold', kfold)';
-    results(iPv, :, :) = cell2mat(currentResults);
-end
-resultsFile = ['data/compareOccluded/' ...
+visibilityMargin = visibilityStepSize / 2;
+evaluateClassifiers = curry(@evaluate, dataset, ...
+    percentsVisible, visibilityMargin, classifiers);
+results = crossval(evaluateClassifiers, ...
+    wholeImagePres, 'kfold', kfold)';
+results = cell2mat(reshape(results, [1 1 kfold]));
+resultsFile = ['data/results-classification/' ...
     datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'];
 save(resultsFile, 'percentsVisible', 'results');
 fprintf('Results stored in ''%s''\n', resultsFile);
