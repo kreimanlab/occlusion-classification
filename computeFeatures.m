@@ -11,7 +11,7 @@ fprintf('Running with args (hopSize=%d)\n', hopSize);
 addpath(genpath(pwd));
 
 %% Setup
-featuresDir = 'data/OcclusionModeling/features';
+featuresDir = 'data/features';
 wholeDir = [featuresDir '/klab325_orig'];
 occlusionDir = [featuresDir '/data_occlusion_klab325v2'];
 % data

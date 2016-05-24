@@ -14,7 +14,7 @@ classdef RnnFeatureProvider < FeatureExtractor
                 occlusionData, originalExtractor)
             self.occlusionData = occlusionData;
             self.originalExtractor = originalExtractor;
-            featuresFile = ['./data/OcclusionModeling/features/'...
+            featuresFile = ['./data/features/'...
                 'RNN_features_fc7_noRelu_t4.mat'];
             self.features = load(featuresFile);
             self.features = self.features.features;
@@ -28,9 +28,9 @@ classdef RnnFeatureProvider < FeatureExtractor
             switch(runType)
                 case RunType.Train
                     features = self.features(...
-                        13000 + self.occlusionData.pres(ids), :);
+                        self.occlusionData.pres(ids), :);
                 case RunType.Test
-                    features = self.features(ids, :);
+                    features = self.features(325 + ids, :);
             end
         end
     end
