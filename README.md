@@ -1,8 +1,9 @@
-# Research at the Kreiman Lab, Harvard Medical School
+# Research on the recognition of occluded images
+##### Kreiman Lab, Harvard Medical School
 
-Projects:
-
-* pattern completion: recognize occluded images after training on whole images
+Constraints:
+* only train on whole images, test on occluded ones
+* use the same classifier on top of all the different feature extractors
 
 
 ## Troubleshooting
