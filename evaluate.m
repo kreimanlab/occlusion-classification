@@ -1,6 +1,4 @@
-function results = evaluate(dataset, percentsVisible, visibilityMargin, ...
-    classifiers, trainPres, testPres)
-results = cell(length(percentsVisible), length(classifiers));
+function results = evaluate(dataset, classifiers, trainPres, testPres)
 for iClassifier = 1:length(classifiers)
     classifier = classifiers{iClassifier};
     fprintf('Training %s on whole images...\n', classifier.getName());
@@ -8,24 +6,24 @@ for iClassifier = 1:length(classifiers)
     trainLabels = dataset.truth(trainRows);
     classifier.train(trainRows, trainLabels);
     
-    for iPv = 1:length(percentsVisible)
-        fprintf('Testing %s on %d percent visibility\n', ...
-            classifier.getName(), percentsVisible(iPv));
-        testRows = getRows(dataset, testPres, false);
-        percentBlack = 100 - percentsVisible(iPv);
-        testRows = testRows(...
-            dataset.black(testRows) >  percentBlack - visibilityMargin &...
-            dataset.black(testRows) <= percentBlack + visibilityMargin);
-        testLabels = dataset.truth(testRows);
-        predictedLabels = classifier.predict(testRows);
-        % analyze
-        [matched, accuracy] = analyzeResults(predictedLabels, testLabels);
-        results{iPv, iClassifier} = struct('name', classifier.getName(), ...
-            'predicted', predictedLabels, 'real', testLabels,...
-            'matched', matched, 'accuracy', accuracy);
+    fprintf('Testing %s on occluded images\n', classifier.getName());
+    testRows = getRows(dataset, testPres, false);
+    testLabels = dataset.truth(testRows);
+    predictedLabels = classifier.predict(testRows);
+    % analyze
+    correct = analyzeResults(predictedLabels, testLabels);
+    currentResults = struct2dataset(struct(...
+        'name', {repmat({classifier.getName()}, length(testRows), 1)}, ...
+        'pres', dataset.pres(testRows), ...
+        'response', predictedLabels, 'truth', testLabels,...
+        'correct', correct, 'black', dataset.black(testRows)));
+    if ~exist('results', 'var')
+        results = currentResults;
+    else
+        results = [results; currentResults];
     end
 end
-results = {cell2mat(results)};
+results = {results}; % box for encapsulating cross validation
 end
 
 function rows = getRows(dataset, pres, uniqueRows)
