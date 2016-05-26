@@ -1,26 +1,27 @@
-function displayResults(results, chanceLevel)
+function displayResults(results)
 if ~exist('chanceLevel', 'var')
-    chanceLevel = 20;
 end
 
 %% Prepare
-percentsVisible = 0:5:35;
-visibilityMargin = (percentsVisible(2) - percentsVisible(1)) / 2;
+percentsBlack = [65:5:95, 99];
+percentsVisible = 100 - percentsBlack;
 classifierNames = unique(results{1}.name);
+chanceLevel = 100 / length(unique(results{1}.truth));
 accuracies = zeros(length(percentsVisible), length(classifierNames), ...
     length(results));
-for iPv = 1:length(percentsVisible)
-    percentBlack = 100 - percentsVisible(iPv);
+for iPb = 1:length(percentsBlack)
     for iCls = 1:length(classifierNames)
         for ik = 1:length(results)
             currentData = results{ik};
             currentData = currentData(...
                 currentData.pres <= 300 & ...
-                currentData.black >  percentBlack - visibilityMargin & ...
-                currentData.black <= percentBlack + visibilityMargin & ...
+                currentData.black >= percentsBlack(iPb) & ...
                 strcmp(currentData.name, classifierNames{iCls}), :);
-            accuracies(iPv, iCls, ik) = 100 * ...
-                sum(currentData.correct) / length(currentData);
+            if iPb < length(percentsBlack)
+                currentData = currentData(...
+                    currentData.black < percentsBlack(iPb + 1), :);
+            end
+            accuracies(iPb, iCls, ik) = 100 * mean(currentData.correct);
         end
     end
 end
@@ -38,16 +39,16 @@ set(gcf, 'paperposition', [.25 .25 10.5 8]);
 hold on;
 xlim([min(percentsVisible)-3, max(percentsVisible)+8]);
 ylim([0 100]);
-errorbar(permute(repmat(percentsVisible, size(results, 2), 1), [2 1]), ...
+errorbar(permute(repmat(percentsVisible, length(classifierNames), 1), [2 1]), ...
     meanValues, standardErrorOfTheMean, 'o-');
 plot(get(gca,'xlim'), [chanceLevel chanceLevel], '--k');
 xlabel('Percent Visible');
 ylabel('Performance');
 % text labels
 for i = 1:size(classifierNames)
-    text(percentsVisible(end) + 1, meanValues(end, i), ...
+    text(percentsVisible(1) + 1, meanValues(1, i), ...
         strrep(classifierNames{i}, '_', '\_'));
 end
 % human
-plotHumanPerformance(percentsVisible);
+plotHumanPerformance(percentsBlack);
 hold off;
