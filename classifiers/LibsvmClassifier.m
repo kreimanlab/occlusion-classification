@@ -11,7 +11,7 @@ classdef LibsvmClassifier < Classifier
         end
         
         function fit(self, X, Y)
-            self.classifier = libsvmtrain(Y, X, '-q');
+            self.classifier = libsvmtrain(Y, X, '-q -c 5');
         end
         
         function Y = classify(self, X)
