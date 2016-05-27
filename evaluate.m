@@ -1,14 +1,14 @@
-function results = evaluate(dataset, classifiers, trainPres, testPres)
-for iClassifier = 1:length(classifiers)
+function results = evaluate(dataset, classifiers, getLabels, trainPres, testPres)
+for iClassifier = 1:numel(classifiers)
     classifier = classifiers{iClassifier};
     fprintf('Training %s on whole images...\n', classifier.getName());
     trainRows = getRows(dataset, trainPres, true);
-    trainLabels = dataset.truth(trainRows);
+    trainLabels = getLabels(dataset, trainRows);
     classifier.train(trainRows, trainLabels);
     
     fprintf('Testing %s on occluded images\n', classifier.getName());
     testRows = getRows(dataset, testPres, false);
-    testLabels = dataset.truth(testRows);
+    testLabels = getLabels(dataset, testRows);
     predictedLabels = classifier.predict(testRows);
     % analyze
     correct = analyzeResults(predictedLabels, testLabels);
