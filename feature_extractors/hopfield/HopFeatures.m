@@ -1,13 +1,13 @@
 classdef HopFeatures < FeatureExtractor
     % Attachment for another feature extractor to post-processes the
     % features with a hopfield network.
-    % Initializes itself with the first test dataset.
+    % Initializes itself when asked to extract train features.
     
     properties
         featuresInput
         net
         netTrained
-        timesteps = 10
+        timesteps = 50
         downsampledLength
     end
     
