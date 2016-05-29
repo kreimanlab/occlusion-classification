@@ -2,21 +2,26 @@ classdef LibsvmClassifier < Classifier
     %LIBSVMCLASSIFIER Libsvm One-vs-all SVM Classifier.
     
     properties
-        classifier
+        model
+        c
     end
     
     methods
-        function obj = LibsvmClassifier(featureExtractor)
+        function obj = LibsvmClassifier(featureExtractor, c)
             obj@Classifier(featureExtractor);
+            if ~exist('c', 'var')
+                c = 1;
+            end
+            obj.c = c;
         end
         
         function fit(self, X, Y)
-            self.classifier = libsvmtrain(Y, X, '-q -c 5');
+            self.model = libsvmtrain(Y, X, ['-q -c ' num2str(self.c)]);
         end
         
         function Y = classify(self, X)
             Y = libsvmpredict(zeros(size(X, 1), 1), ...
-                X, self.classifier, '-q');
+                X, self.model, '-q');
         end
     end
 end
