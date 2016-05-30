@@ -3,31 +3,30 @@ function results = evaluate(task, dataset, classifiers, getLabels, ...
 if strcmp(task, 'identification')
     testPres = trainPres;
 end
-for iClassifier = 1:numel(classifiers)
+trainRows = getRows(dataset, trainPres, true);
+trainLabels = getLabels(dataset, trainRows);
+testRows = getRows(dataset, testPres, false);
+testPresAll = dataset.pres(testRows);
+testBlack = dataset.black(testRows);
+testLabels = getLabels(dataset, testRows);
+results = cell(numel(classifiers), 1);
+parfor iClassifier = 1:numel(classifiers)
     classifier = classifiers{iClassifier};
     fprintf('Training %s on whole images...\n', classifier.getName());
-    trainRows = getRows(dataset, trainPres, true);
-    trainLabels = getLabels(dataset, trainRows);
     classifier.train(trainRows, trainLabels);
-    
     fprintf('Testing %s on occluded images\n', classifier.getName());
-    testRows = getRows(dataset, testPres, false);
-    testLabels = getLabels(dataset, testRows);
     predictedLabels = classifier.predict(testRows);
     % analyze
     correct = analyzeResults(predictedLabels, testLabels);
     currentResults = struct2dataset(struct(...
         'name', {repmat({classifier.getName()}, length(testRows), 1)}, ...
-        'pres', dataset.pres(testRows), ...
-        'response', predictedLabels, 'truth', testLabels,...
-        'correct', correct, 'black', dataset.black(testRows)));
-    if ~exist('results', 'var')
-        results = currentResults;
-    else
-        results = [results; currentResults];
-    end
+        'pres', testPresAll, 'black', testBlack, ...
+        'response', predictedLabels, 'truth', testLabels, ...
+        'correct', correct));
+    results(iClassifier) = {currentResults};
 end
-results = {results}; % box for encapsulating cross validation
+% merge datasets and box for encapsulating cross validation
+results = {vertcat(results{:})};
 end
 
 function rows = getRows(dataset, pres, uniqueRows)

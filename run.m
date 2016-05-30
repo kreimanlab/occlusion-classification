@@ -55,7 +55,9 @@ rng(1, 'twister'); % seed, use pseudo random generator for reproducibility
 
 %% Run
 evaluateClassifiers = curry(@evaluate, task, dataset, classifiers, getLabels);
+parallelPoolObject = parpool; % init parallel computing pool
 results = crossval(evaluateClassifiers, wholeImagePres, 'kfold', kfold)';
+delete(parallelPoolObject); % teardown pool
 resultsFile = ['data/results-' task '/' ...
     datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'];
 save(resultsFile, 'results');
