@@ -54,7 +54,7 @@ classifiers = cellfun(@(featureExtractor) SvmClassifier(featureExtractor), ...
 rng(1, 'twister'); % seed, use pseudo random generator for reproducibility
 
 %% Run
-evaluateClassifiers = curry(@evaluate, dataset, classifiers, getLabels);
+evaluateClassifiers = curry(@evaluate, task, dataset, classifiers, getLabels);
 results = crossval(evaluateClassifiers, wholeImagePres, 'kfold', kfold)';
 resultsFile = ['data/results-' task '/' ...
     datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'];

@@ -1,4 +1,8 @@
-function results = evaluate(dataset, classifiers, getLabels, trainPres, testPres)
+function results = evaluate(task, dataset, classifiers, getLabels, ...
+    trainPres, testPres)
+if strcmp(task, 'identification')
+    testPres = trainPres;
+end
 for iClassifier = 1:numel(classifiers)
     classifier = classifiers{iClassifier};
     fprintf('Training %s on whole images...\n', classifier.getName());
