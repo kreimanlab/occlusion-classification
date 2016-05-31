@@ -5,13 +5,17 @@ classdef Classifier < handle
         featureExtractor
     end
     
+    properties (Abstract)
+        name
+    end
+    
     methods
         function obj = Classifier(featureExtractor)
             obj.featureExtractor = featureExtractor;
         end
         
         function name = getName(self)
-            name = self.featureExtractor.getName();
+            name = [self.featureExtractor.getName() '-' self.name];
         end
         
         function train(self, X, Y)
