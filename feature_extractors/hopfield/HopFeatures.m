@@ -17,14 +17,14 @@ classdef HopFeatures < FeatureExtractor
             obj.featuresInput = featuresInput;
             obj.netTrained = false;
         end
-        
+    
         function name = getName(self)
             name = [self.featuresInput.getName() '-hop'];
         end
         
         function features = extractFeatures(self, rows, runType)
             previousFeatures = self.featuresInput.extractFeatures(rows, runType);
-            previousFeatures = self.downsample(previousFeatures);
+            previousFeatures = self.downsample(previousFeatures, runType);
             if runType == RunType.Train
                 % train network
                 T = previousFeatures';
@@ -47,16 +47,7 @@ classdef HopFeatures < FeatureExtractor
         end
     end
     
-    methods(Access = private)
-        function downsampledFeatures = downsample(self, features)
-            sampleSteps = ceil(size(features, 2) / self.downsampledLength);
-            downsampledFeatures = zeros(size(features, 1), ...
-                ceil(size(features, 2) / sampleSteps));
-            for i = 1:size(features, 1)
-                downsampledFeatures(i, :) = downsample(features(i, :), ...
-                    sampleSteps);
-            end
-        end
+    methods(Abstract)
+        downsample(self, features, runType)
     end
 end
-
