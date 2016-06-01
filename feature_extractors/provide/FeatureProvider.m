@@ -29,7 +29,7 @@ classdef FeatureProvider < FeatureExtractor
             name = strrep(name, 'alexnet-', 'caffenet_');
         end
         
-        function features = extractFeatures(self, rows, runType)
+        function features = extractFeatures(self, rows, runType, ~)
             boxedFeatures = cell(length(rows), 1);
             cache = self.caches(char(runType));
             for i = 1:length(rows)

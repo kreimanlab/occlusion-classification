@@ -17,7 +17,7 @@ classdef BipolarFeatures < FeatureExtractor
                 '-bipolar' num2str(self.threshold)];
         end
         
-        function features = extractFeatures(self, images, runType)
+        function features = extractFeatures(self, images, runType, ~)
             T = self.featuresInput.extractFeatures(images, runType);
             features = bipolarize(T, self.threshold);
         end

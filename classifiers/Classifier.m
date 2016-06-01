@@ -20,13 +20,13 @@ classdef Classifier < handle
         
         function train(self, X, Y)
             features = self.featureExtractor.extractFeatures(X, ...
-                RunType.Train);
+                RunType.Train, Y);
             self.fit(features, Y);
         end
         
         function labels = predict(self, X)
             features = self.featureExtractor.extractFeatures(X, ...
-                RunType.Test);
+                RunType.Test, []);
             labels = self.classify(features);
         end
     end

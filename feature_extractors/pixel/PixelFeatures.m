@@ -9,7 +9,7 @@ classdef PixelFeatures < FeatureExtractor
             name = 'pixels';
         end
         
-        function features = extractFeatures(~, images, ~)
+        function features = extractFeatures(~, images, ~, ~)
             features = zeros(length(images), numel(images{1}));
             for i = 1:length(images)
                 flatPixels = reshape(images{i}, [1 numel(images{i})]);

@@ -21,8 +21,9 @@ classdef HopFeatures < FeatureExtractor
                 num2str(self.timesteps)];
         end
         
-        function features = extractFeatures(self, rows, runType)
-            previousFeatures = self.featuresInput.extractFeatures(rows, runType);
+        function features = extractFeatures(self, rows, runType, labels)
+            previousFeatures = self.featuresInput.extractFeatures(...
+                rows, runType, labels);
             if runType == RunType.Train
                 % train network
                 T = previousFeatures';

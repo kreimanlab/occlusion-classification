@@ -9,7 +9,7 @@ classdef RnnFeatures < FeatureExtractor
             name = 'rnn';
         end
         
-        function features = extractFeatures(~, ~, ~)
+        function features = extractFeatures(~, ~, ~, ~)
             error('Not implemented');
         end
     end

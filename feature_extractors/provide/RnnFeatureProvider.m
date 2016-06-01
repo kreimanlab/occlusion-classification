@@ -24,7 +24,7 @@ classdef RnnFeatureProvider < FeatureExtractor
             name = self.originalExtractor.getName();
         end
         
-        function features = extractFeatures(self, ids, runType)
+        function features = extractFeatures(self, ids, runType, ~)
             switch(runType)
                 case RunType.Train
                     features = self.features(...

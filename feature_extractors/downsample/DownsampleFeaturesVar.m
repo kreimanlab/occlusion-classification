@@ -19,7 +19,7 @@ classdef DownsampleFeaturesVar < FeatureExtractor
                 '-downsample' num2str(self.downsampledLength) '_var'];
         end
         
-        function features = extractFeatures(self, images, runType)
+        function features = extractFeatures(self, images, runType, ~)
             features = self.featuresInput.extractFeatures(images, runType);
             if runType == RunType.Train
                 variances = var(features, 1);

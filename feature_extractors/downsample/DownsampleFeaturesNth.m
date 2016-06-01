@@ -18,7 +18,7 @@ classdef DownsampleFeaturesNth < FeatureExtractor
                 '-downsample' num2str(self.downsampledLength) '_nth'];
         end
         
-        function features = extractFeatures(self, images, runType)
+        function features = extractFeatures(self, images, runType, ~)
             features = self.featuresInput.extractFeatures(images, runType);
             features = downsampleNth(features, self.downsampledLength);
         end

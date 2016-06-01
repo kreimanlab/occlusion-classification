@@ -9,7 +9,7 @@ classdef HmaxFeatures < FeatureExtractor
             name = 'hmax';
         end
         
-        function features = extractFeatures(~, images, ~)
+        function features = extractFeatures(~, images, ~, ~)
             c2 = runHmax(images);
             features = poolC2(c2);
             assert(length(images) == size(features, 1));

@@ -19,7 +19,7 @@ classdef ImageProvider < FeatureExtractor
             name = self.consumer.getName();
         end
         
-        function features = extractFeatures(self, dataSelection, runType)
+        function features = extractFeatures(self, dataSelection, runType, ~)
             imgs = self.images(self.data.pres(dataSelection));
             if runType == RunType.Test
                 imgs = occlude(imgs, dataSelection, self.data);
