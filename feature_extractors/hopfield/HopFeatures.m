@@ -8,23 +8,21 @@ classdef HopFeatures < FeatureExtractor
         net
         netTrained
         timesteps = 50
-        downsampledLength
     end
     
     methods
-        function obj = HopFeatures(downsampledLength, featuresInput)
-            obj.downsampledLength = downsampledLength;
+        function obj = HopFeatures(featuresInput)
             obj.featuresInput = featuresInput;
             obj.netTrained = false;
         end
     
         function name = getName(self)
-            name = [self.featuresInput.getName() '-hop'];
+            name = [self.featuresInput.getName() '-hop_t' ...
+                num2str(self.timesteps)];
         end
         
         function features = extractFeatures(self, rows, runType)
             previousFeatures = self.featuresInput.extractFeatures(rows, runType);
-            previousFeatures = self.downsample(previousFeatures, runType);
             if runType == RunType.Train
                 % train network
                 T = previousFeatures';
@@ -45,9 +43,5 @@ classdef HopFeatures < FeatureExtractor
                 end
             end
         end
-    end
-    
-    methods(Abstract)
-        downsample(self, features, runType)
     end
 end
