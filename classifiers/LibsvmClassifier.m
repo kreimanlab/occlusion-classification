@@ -33,7 +33,7 @@ classdef LibsvmClassifier < Classifier
         end
         
         function Y = classify(self, X)
-            Y = libsvmpredict(zeros(size(X, 1), 1), ...
+            Y = libsvmpredict(rand(size(X, 1), 1), ...
                 X, self.model, '-q');
         end
     end
