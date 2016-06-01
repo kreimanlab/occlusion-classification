@@ -1,0 +1,16 @@
+function accuracies = collectAccuracies(results, ...
+    percentBlackMin, percentBlackMax, classifierNames)
+accuracies = zeros(length(classifierNames), length(results));
+for iCls = 1:length(classifierNames)
+    for ikfold = 1:length(results)
+        currentData = results{ikfold};
+        currentData = currentData(...
+            currentData.pres <= 300 & ...
+            currentData.black >= percentBlackMin & ...
+            currentData.black < percentBlackMax & ...
+            strcmp(currentData.name, classifierNames{iCls}), :);
+        accuracies(iCls, ikfold) = 100 * mean(currentData.correct);
+    end
+end
+end
+
