@@ -34,7 +34,7 @@ classdef LibsvmClassifierCCV < Classifier
             self.classifier.fit(X, Y);
         end
         
-        function performance = trainAndTest(~, c, ...
+        function performance = trainAndTest(self, c, ...
                 Xtrain, Ytrain, Xtest, Ytest)
             cls = LibsvmClassifier([], self.t, c);
             cls.fit(Xtrain, Ytrain);
