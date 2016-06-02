@@ -34,7 +34,6 @@ set(gcf, 'paperposition', [.25 .25 10.5 8]);
 % plots
 hold on;
 xlim([min(percentsVisible)-3, max(percentsVisible)+8]);
-% ylim([0 100]);
 errorbar(permute(repmat(percentsVisible, length(classifierNames), 1), [2 1]), ...
     meanValues, standardErrorOfTheMean, 'o-');
 plot(get(gca,'xlim'), [chanceLevel chanceLevel], '--k');
@@ -47,6 +46,7 @@ for i = 1:size(classifierNames)
 end
 % human
 if chanceLevel == 20
+    ylim([0 100]);
     plotHumanPerformance(percentsBlack);
 end
 hold off;

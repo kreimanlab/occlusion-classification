@@ -1,15 +1,15 @@
 function plotHumanPerformance(percentsBlack)
+if ~exist('percentsBlack', 'var')
+    percentsBlack = [65:5:95, 99];
+end
+
 percentsBlack = sort(percentsBlack);
 dataset = load('data/data_occlusion_klab325v2.mat');
 dataset = dataset.data;
-dataset = dataset(...
-    dataset.pres <= 300 & ...
-    dataset.masked == 0 & ...
-    dataset.soa == .15 & ...
-    dataset.occluded == 1, :);
+dataset = filterHumanData(dataset);
 [meanValues, standardErrorOfTheMean] = statsAcrossAll(dataset, percentsBlack);
 errorbar(permute(100 - percentsBlack, [2 1]), ...
-    meanValues, standardErrorOfTheMean, 'o-');
+    meanValues, standardErrorOfTheMean, 'blacko-');
 text(100 - percentsBlack(1) + 1, meanValues(1), 'human');
 end
 
