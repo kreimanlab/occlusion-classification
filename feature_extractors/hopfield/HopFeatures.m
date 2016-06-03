@@ -7,11 +7,12 @@ classdef HopFeatures < FeatureExtractor
         featuresInput
         net
         netTrained
-        timesteps = 50
+        timesteps
     end
     
     methods
-        function obj = HopFeatures(featuresInput)
+        function obj = HopFeatures(timesteps, featuresInput)
+            obj.timesteps = timesteps;
             obj.featuresInput = featuresInput;
             obj.netTrained = false;
         end
@@ -21,7 +22,8 @@ classdef HopFeatures < FeatureExtractor
                 num2str(self.timesteps)];
         end
         
-        function features = extractFeatures(self, rows, runType, labels)
+        function [features, y] = extractFeatures(self, rows, ...
+                runType, labels)
             previousFeatures = self.featuresInput.extractFeatures(...
                 rows, runType, labels);
             if runType == RunType.Train
