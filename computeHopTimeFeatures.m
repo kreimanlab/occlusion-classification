@@ -13,7 +13,7 @@ dataset = dataset.data;
 featureProvider = curry(@FeatureProvider, dataset, 1:length(dataset));
 featureExtractor = HopFeatures(max(savesteps), ...
     BipolarFeatures(0, ...
-    featureProvider(AlexnetFc7FeaturesKlabData())));
+    featureProvider(AlexnetFc7Features())));
 
 %% Run
 % whole = fc7. just train hop network on whole.

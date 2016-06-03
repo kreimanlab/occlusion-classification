@@ -1,13 +1,4 @@
 function computeFeatures(varargin)
-
-%% Parameters
-argParser = inputParser();
-argParser.KeepUnmatched = true;
-argParser.addOptional('hopSize', 1000, @isnumeric);
-argParser.parse(varargin{:});
-hopSize = argParser.Results.hopSize;
-fprintf('Running with args (hopSize=%d)\n', hopSize);
-
 addpath(genpath(pwd));
 
 %% Setup
@@ -17,19 +8,14 @@ occlusionDir = [featuresDir '/data_occlusion_klab325v2'];
 % data
 dataset = load('data/data_occlusion_klab325v2.mat');
 dataset = dataset.data;
-dataset.occluded = []; % delete unneeded columns to free up space
-dataset.scramble = []; dataset.pres_time = []; dataset.reaction_times = [];
-dataset.responses = []; dataset.correct = []; dataset.VBLsoa = [];
-dataset.masked = []; dataset.subject = []; dataset.strong = [];
-% classifiers
+% feature extractors
 featureProvider = curry(@FeatureProvider, dataset, 1:length(dataset));
-hop = curry(@HopFeatures, hopSize);
 featureExtractors = {...
-    hop(BipolarFeatures(126 / 2, ImageProvider(dataset, PixelFeatures()))), ...
-    hop(BipolarFeatures(0.8, featureProvider(HmaxFeatures()))), ...
-    hop(BipolarFeatures(0, featureProvider(AlexnetPool5FeaturesKlabData()))), ...
-    hop(BipolarFeatures(0, featureProvider(AlexnetFc7FeaturesKlabData()))), ...
-    hop(BipolarFeatures(0, featureProvider(AlexnetFc8Features())))
+    HopFeatures(BipolarFeatures(126 / 2, ImageProvider(dataset, PixelFeatures()))), ...
+    HopFeatures(BipolarFeatures(0.8, featureProvider(HmaxFeatures()))), ...
+    HopFeatures(BipolarFeatures(0, featureProvider(AlexnetPool5Features()))), ...
+    HopFeatures(BipolarFeatures(0, featureProvider(AlexnetFc7Features()))), ...
+    HopFeatures(BipolarFeatures(0, featureProvider(AlexnetFc8Features())))
     };
 
 %% Run
