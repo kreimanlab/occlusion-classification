@@ -28,10 +28,8 @@ classdef HopFeatures < FeatureExtractor
                 rows, runType, labels);
             if runType == RunType.Train
                 % train network
-                T = previousFeatures';
-                self.net = newhop(T);
-                self.netTrained = true;
-                features = T';
+                self.net = self.trainNet(previousFeatures);
+                features = previousFeatures;
             elseif runType == RunType.Test
                 if ~self.netTrained
                     error('net was not trained yet');
@@ -45,6 +43,12 @@ classdef HopFeatures < FeatureExtractor
                     features(i,:) = T';
                 end
             end
+        end
+        
+        function net = trainNet(self, features)
+            T = features';
+            net = newhop(T);
+            self.netTrained = true;
         end
     end
 end
