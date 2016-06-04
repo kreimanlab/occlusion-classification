@@ -2,7 +2,7 @@
 
 case "$1" in
 "classification" | "identification")
-  queue=parallel -n 12
+  queue="parallel -n 12"
   fnc="run('$1')";
   ;;
 "features")
@@ -21,6 +21,6 @@ esac
 bsub -J $1-${PWD##*/} \
   -R "rusage[mem=16000]" \
   -W 96:0 \
-  -q "$queue" \
+  -q $queue \
   -o $(date +%Y-%m-%d_%H:%M:%S).out -e $(date +%Y-%m-%d_%H:%M:%S).err \
   matlab -nodisplay -r "$fnc;exit"
