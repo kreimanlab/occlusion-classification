@@ -79,7 +79,7 @@ classdef FeatureProvider < FeatureExtractor
         
         function [filePrefix, fileSuffix, loadFeatures] = ...
                 getFileDirectives(self, originalExtractor)
-            name = self.originalExtractor.getName();
+            name = originalExtractor.getName();
             switch(name)
                 case 'alexnet-pool5'
                     filePrefix = 'caffenet_pool5_ims_';
@@ -94,17 +94,6 @@ classdef FeatureProvider < FeatureExtractor
                     fileSuffix = '.mat';
                     loadFeatures = @self.loadMat;
                 otherwise
-                    if isempty(regexp(name, ...
-                            ['^('...
-                            '(pixels)'...
-                            '|(((alexnet)|(caffenet))(\-|_)((pool5)|(fc7)))'...
-                            '|(hmax)'...
-                            ')'...
-                            '\-bipolar[0-9]+(\.[0-9]+)?(\-hop)?'...
-                            '$'], 'once'))
-                        error(['Unknown classifier ' originalExtractor.getName()]);
-                    end
-                    
                     filePrefix = [strrep(name, 'alexnet-', 'caffenet_') '_'];
                     fileSuffix = '.mat';
                     loadFeatures = @self.loadMat;
