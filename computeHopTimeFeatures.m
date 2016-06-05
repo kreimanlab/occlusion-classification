@@ -5,6 +5,7 @@ savesteps = [1:20, 30:10:100, 200:100:1000];
 
 %% Setup
 featuresDir = 'data/features';
+wholeDir = [featuresDir '/klab325_orig'];
 occlusionDir = [featuresDir '/data_occlusion_klab325v2'];
 % data
 dataset = load('data/data_occlusion_klab325v2.mat');
@@ -19,7 +20,11 @@ featureExtractor = HopFeatures(max(savesteps), ...
 % whole = fc7. just train hop network on whole.
 [~, wholePresRows] = unique(dataset, 'pres');
 fprintf('Training on %d whole objects\n', numel(wholePresRows));
-featureExtractor.extractFeatures(wholePresRows, RunType.Train, []);
+features = featureExtractor.extractFeatures(wholePresRows, RunType.Train, []);
+for t = savesteps
+    saveFeatures(features, wholeDir, ...
+        featureExtractor, t, 1, 325);
+end
 % occluded
 for dataIter = 1:1000:length(dataset)
     fprintf('%s occluded %d/%d\n', featureExtractor.getName(), ...
