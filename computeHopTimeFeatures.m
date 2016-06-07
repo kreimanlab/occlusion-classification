@@ -1,7 +1,7 @@
 function computeHopTimeFeatures()
 addpath(genpath(pwd));
 
-savesteps = [1:20, 30:10:100, 200:100:1000];
+savesteps = [1:20, 30:10:100, 200:100:500];
 
 %% Setup
 featuresDir = 'data/features';
@@ -30,10 +30,12 @@ for dataIter = 1:1000:length(dataset)
     fprintf('%s occluded %d/%d\n', featureExtractor.getName(), ...
         dataIter, length(dataset));
     dataEnd = dataIter + 999;
-    [~, y] = featureExtractor.extractFeatures(dataIter:dataEnd, ...
+    [~, ys] = featureExtractor.extractFeatures(dataIter:dataEnd, ...
         RunType.Test, []);
     for t = savesteps
-        saveFeatures(y{t}, occlusionDir, ...
+        features = ys(:, :, t);
+        assert(size(features, 1) == dataEnd - dataIter + 1);
+        saveFeatures(features, occlusionDir, ...
             featureExtractor, t, dataIter, dataEnd);
     end
 end

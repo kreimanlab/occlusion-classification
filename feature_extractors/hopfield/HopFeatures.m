@@ -22,7 +22,7 @@ classdef HopFeatures < FeatureExtractor
                 num2str(self.timesteps)];
         end
         
-        function [features, y] = extractFeatures(self, rows, ...
+        function [features, ys] = extractFeatures(self, rows, ...
                 runType, labels)
             previousFeatures = self.featuresInput.extractFeatures(...
                 rows, runType, labels);
@@ -36,11 +36,13 @@ classdef HopFeatures < FeatureExtractor
                 end
                 % retrieve from network
                 features = zeros(size(previousFeatures));
+                ys = NaN([size(previousFeatures), self.timesteps]);
                 for i = 1:size(features, 1)
                     y = self.net({1 self.timesteps}, {}, ...
                         {previousFeatures(i, :)'});
+                    ys(i, :, :) = cell2mat(y);
                     T = y{self.timesteps};
-                    features(i,:) = T';
+                    features(i, :) = T';
                 end
             end
         end
