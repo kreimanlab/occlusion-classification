@@ -1,27 +1,31 @@
 function plotOverallPerformanceOverTime(results)
 if iscell(results)
-results = results{:};
+    results = vertcat(results{:});
 end
 
-classifierNames = unique(results.name);
-timesteps = NaN(length(classifierNames), 1); % x
-performances = NaN(length(classifierNames), 1); % y
-for i = 1:length(timesteps)
-    token = regexp(classifierNames{i}, '\-hop_t([0-9]+)', 'tokens');
-    timesteps(i) = str2num(token{1}{1});
-    
-    currentResults = results(strcmp(results.name, classifierNames{i}), :);
+[modelNames, modelTimestepNames, timesteps] = ...
+    collectModelProperties(results);
+performances = NaN(size(timesteps));
+for i = 1:numel(timesteps)
+    currentResults = results(strcmp(results.name, modelTimestepNames{i}), :);
     performances(i) = mean(currentResults.correct);
 end
-[~, sortedIndices] = sort(timesteps);
-timesteps = timesteps(sortedIndices); 
-performances = performances(sortedIndices) * 100;
-plot(timesteps, performances, 'bo-');
-text(timesteps(end-1), performances(end) + 5, 'hopfield', 'Color', 'blue');
+performances = performances * 100;
+for modelType = 1:numel(modelNames)
+    p = plot(performances(modelType, :), 'o-');
+    hold on;
+    text(length(timesteps(modelType, :))-1, ...
+        mean(performances(modelType, :), 'omitnan'), ...
+        modelNames{modelType}, 'Color', get(p, 'Color'));
+end
+xlabels = arrayfun(@(i) ...
+    strjoin(cellstr(num2str(timesteps(:, i))), '\n'), ...
+    1:size(timesteps, 2), ...
+    'UniformOutput', false);
+my_xticklabels(1:length(xlabels), xlabels);
 xlabel('Time step');
 ylabel('Performance');
 ylim([0 100]);
-hold on;
 plotOverallHumanPerformance();
 hold off;
 end

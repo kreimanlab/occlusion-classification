@@ -1,4 +1,7 @@
 function filteredResults = filterResults(results, filterFnc)
+if ~iscell(results)
+    results = {results};
+end
 if ~exist('filterFnc', 'var')
     filterFnc = @(data) ones(size(data, 1), 1);
 end
