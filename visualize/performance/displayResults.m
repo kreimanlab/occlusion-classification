@@ -26,7 +26,6 @@ standardErrorOfTheMean = std(accuracies, 0, dimKfolds, 'omitnan') / ...
     sqrt(kfolds);
 
 %% Graph
-figure();
 % rotate to properly display on pdf
 orient portrait;
 set(gcf, 'papersize', [11 8.5]);

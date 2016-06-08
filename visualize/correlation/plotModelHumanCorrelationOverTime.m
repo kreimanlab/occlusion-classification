@@ -31,21 +31,25 @@ humanHumanCorrelation = corr(...
 [modelNames, modelTimestepNames, timesteps] = ...
     collectModelProperties(modelResults);
 modelHumanCorrelations = NaN(size(modelTimestepNames));
-modelCorrect = NaN([length(presIds), size(modelTimestepNames)]);
-for i = 1:numel(modelTimestepNames)
-    for cri = 1:size(modelCorrect, 1);
-        pres = presIds(cri);
+modelCorrect = NaN([length(presIds), size(modelTimestepNames)]); % pres x type x model
+for model = 1:numel(modelTimestepNames)
+    if isempty(modelTimestepNames{model})
+        continue;
+    end
+    for presIter = 1:length(presIds)
+        pres = presIds(presIter);
         relevantResults = modelResults(...
-            strcmp(modelTimestepNames(i), modelResults.name) & ...
+            strcmp(modelTimestepNames{model}, modelResults.name) & ...
             modelResults.pres == pres, :);
         assert(~isempty(relevantResults));
-        modelCorrect(cri, i) = mean(relevantResults.correct);
+        modelCorrect(presIter, model) = mean(relevantResults.correct);
     end
-    modelHumanCorrelations(i) = corr(modelCorrect(:, i), humanCorrect(:));
+    modelHumanCorrelations(model) = corr(...
+        modelCorrect(:, model), humanCorrect(:));
 end
-% plot
-bar(modelHumanCorrelations', ...
-    'EdgeColor', 'none');
+
+%% plot overall correlations
+bar(modelHumanCorrelations', 'EdgeColor', 'none');
 box off;
 hold on;
 plot(get(gca, 'xlim'), [humanHumanCorrelation humanHumanCorrelation], ...
@@ -68,57 +72,67 @@ xlabel('Time step');
 ylabel('Corr. with Human');
 hold off;
 
+%% plot exemplar correlations
 figure('Name', 'Similarity Exemplars');
+subplotRows = size(modelTimestepNames, 1);
+subplotCols = size(modelTimestepNames, 2);
 for modelType = 1:size(modelTimestepNames, 1)
     for model = 1:size(modelTimestepNames, 2)
-        subplot(size(modelTimestepNames, 1), size(modelTimestepNames, 2), ...
-            (modelType - 1) * size(modelTimestepNames, 2) + model);
-        plot(100 * humanCorrect, 100 * modelCorrect(:, modelType, model),...
-            '.', 'Color', [0.7 0.7 0.7], 'MarkerSize', 10);
+        subplot(subplotRows, subplotCols, ...
+            (modelType - 1) * subplotCols + model);
+        hold on;
+        plot(100 * humanCorrect, ...
+            100 * modelCorrect(:, modelType, model),...
+            '.', 'Color', [.7 .7 .7], 'MarkerSize', 10);
         h = lsline; set(h, 'Color', 'k');
+        colors = ['r', 'b', 'g', 'y', 'm'];
+        for pres = presIds
+            category = humanResults.truth(...
+                find(humanResults.pres == pres, 1));
+            plot(100 * humanCorrect(pres), ...
+                100 * modelCorrect(pres, modelType, model),...
+                '.', 'Color', colors(category), 'MarkerSize', 10);
+        end
         correlation = corr(modelCorrect(:, modelType, model), ...
             humanCorrect(:, 1));
-        title(sprintf('r = %.2f', correlation));
+        title(sprintf('t = %d, r = %.2f', ...
+            timesteps(modelType,model), correlation));
         xlabel('Performance (human)'); axis square;
         if(model == 1)
             ylabel(['Performance (' modelNames{modelType} ')']);
         end
+        if modelType == 1 && model == size(modelTimestepNames, 2)
+            labelDummies = zeros(size(colors));
+            for c = 1:length(colors)
+                labelDummies(c) = plot(NaN, NaN, colors(c));
+            end
+            leg = legend(labelDummies, stringifyLabels(1:5), ...
+                'Orientation', 'horizontal');
+            set(leg, 'Position', [0.37 0.8 0.3 0.05], ...
+                'Units', 'normalized');
+        end
+        hold off;
     end
 end
-end
 
-function [abbreviatedNames, timestepNames, timesteps] = ...
-    collectModelProperties(modelResults)
-modelPrefixes = {'rnn', 'caffe'};
-typeAbbreviations = {'RNN', 'hop'};
-uniqueNames = sort(unique(modelResults.name));
-modelPresent = cell2mat(...
-    cellfun(@(s) any(cell2mat(strfind(lower(uniqueNames), s))), ...
-    modelPrefixes, 'UniformOutput', false));
-abbreviatedNames = typeAbbreviations(logical(modelPresent));
-numModelTypes = sum(modelPresent);
-timestepNames = cell(length(uniqueNames) / numModelTypes, numModelTypes);
-timesteps = NaN(length(uniqueNames) / numModelTypes, numModelTypes);
-i = 1;
-for typePrefix = modelPrefixes
-    typeTimestepNames = uniqueNames(~cellfun(@isempty, ...
-        strfind(lower(uniqueNames), typePrefix)));
-    typeTimesteps = cell2mat(cellfun(@(name) timestepFromName(name), ...
-        typeTimestepNames, 'UniformOutput', false));
-    [typeTimesteps, sortIndices] = sort(typeTimesteps, 'ascend');
-    typeTimestepNames = typeTimestepNames(sortIndices);
-    timestepNames(i:i+length(typeTimestepNames)-1) = typeTimestepNames;
-    timesteps(i:i+length(typeTimesteps)-1) = typeTimesteps;
-    i = i + length(typeTimestepNames);
-end
-timestepNames = timestepNames'; timesteps = timesteps';
-end
-
-function timestep = timestepFromName(classifierName)
-token = regexp(classifierName, '_t([0-9]+)', 'tokens');
-if isempty(token)
-    timestep = 0;
-else
-    timestep = str2double(token{1}{1});
+%% highest distance (human-model) objects
+topNWorst = 5;
+images = load('data/KLAB325.mat');
+images = images.img_mat;
+figure('Name', 'Highest distance model - human');
+for modelType = 1:numel(modelNames)
+    lastTimestep = find(~any(isnan(modelCorrect(:, modelType, :))), 1, 'last');
+    diffs = humanCorrect - modelCorrect(:, modelType, lastTimestep);
+    [~, worstPres] = sort(diffs, 'descend');
+    for worstIndex = 1:topNWorst
+        pres = worstPres(worstIndex);
+        subplot(numel(modelNames), topNWorst, ...
+            (modelType - 1) * topNWorst + worstIndex);
+        imshow(images{pres});
+        title(sprintf('#%d %s %.0f%% - human %.0f%%', ...
+            pres, modelNames{modelType}, ...
+            100 * mean(modelCorrect(pres, modelType, lastTimestep)), ...
+            100 * mean(humanCorrect(pres))));
+    end
 end
 end
