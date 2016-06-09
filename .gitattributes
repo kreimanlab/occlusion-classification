@@ -1,1 +1,2 @@
 feature_extractors/alexnet/ressources/*Params.mat filter=lfs diff=lfs merge=lfs -text
+data/features/** filter=lfs diff=lfs merge=lfs -text
