@@ -29,12 +29,3 @@ ylim([0 100]);
 plotOverallHumanPerformance();
 hold off;
 end
-
-function plotOverallHumanPerformance()
-humanResults = load('data/data_occlusion_klab325v2.mat');
-humanResults = filterHumanData(humanResults.data);
-performance = mean(humanResults.correct) * 100;
-xlim = get(gca,'xlim');
-line(xlim, [performance performance], 'Color', 'black');
-text(xlim(1) + (xlim(2) - xlim(1)) / 10, performance + 5, 'human');
-end

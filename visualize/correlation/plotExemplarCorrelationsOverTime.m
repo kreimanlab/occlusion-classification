@@ -5,6 +5,7 @@ function plotExemplarCorrelationsOverTime(corrData)
 figure('Name', 'Similarity Exemplars');
 subplotRows = size(corrData.modelTimestepNames, 1);
 subplotCols = size(corrData.modelTimestepNames, 2);
+[labelNames, colors] = getLabelDescriptions();
 for modelType = 1:size(corrData.modelTimestepNames, 1)
     for model = 1:size(corrData.modelTimestepNames, 2)
         subplot(subplotRows, subplotCols, ...
@@ -14,7 +15,6 @@ for modelType = 1:size(corrData.modelTimestepNames, 1)
             100 * corrData.modelCorrect(:, modelType, model),...
             '.', 'Color', [.7 .7 .7], 'MarkerSize', 10);
         h = lsline; set(h, 'Color', 'k');
-        colors = ['r', 'b', 'g', 'y', 'm'];
         for pres = corrData.presIds
             category = corrData.humanResults.truth(...
                 find(corrData.humanResults.pres == pres, 1));
@@ -35,7 +35,7 @@ for modelType = 1:size(corrData.modelTimestepNames, 1)
             for c = 1:length(colors)
                 labelDummies(c) = plot(NaN, NaN, colors(c));
             end
-            leg = legend(labelDummies, stringifyLabels(1:5), ...
+            leg = legend(labelDummies, labelNames, ...
                 'Orientation', 'horizontal');
             set(leg, 'Position', [0.37 0.8 0.3 0.05], ...
                 'Units', 'normalized');
