@@ -11,6 +11,7 @@ classdef LibsvmClassifier < Classifier
         model
         t % kernel type
         c % cost of C-SVC
+        numTrainedFeatures
     end
     
     methods
@@ -30,9 +31,15 @@ classdef LibsvmClassifier < Classifier
         function fit(self, X, Y)
             self.model = libsvmtrain(Y, X, ...
                 ['-q -t ' num2str(self.t) ' -c ' num2str(self.c)]);
+            self.numTrainedFeatures = size(X, 2);
         end
         
         function Y = classify(self, X)
+            if size(X, 2) ~= self.numTrainedFeatures
+%                 error(['invalid number of features: ' ...
+%                     'expected ' num2str(self.numTrainedFeatures) ...
+%                     ', got ' num2str(size(X, 2)) ]);
+            end
             Y = libsvmpredict(rand(size(X, 1), 1), ...
                 X, self.model, '-q');
         end
