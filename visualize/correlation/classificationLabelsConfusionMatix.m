@@ -1,14 +1,24 @@
 function classificationLabelsConfusionMatix(results, classifierName)
 if iscell(results)
-results = results{:};
+results = vertcat(results{:});
 end
-results = results(strcmp(results.name, classifierName), :);
+if exist('classifierName', 'var')
+    results = results(strcmp(results.name, classifierName), :);
+    nameSuffix = [' of ' classifierName];
+else
+    nameSuffix = '';
+    % else work on all results (i.e. assume human)
+end
 targets = results.truth;
-outputs = results.response;
-
-figure('Name', ['Classified labels of ' classifierName ' (qualitative)']);
+if ismember('response', get(results, 'VarNames'))
+    outputs = results.response;
+else
+    assert(ismember('response_category', get(results,'VarNames')));
+    outputs = results.response_category;
+end
+figure('Name', ['Classified labels' nameSuffix ' (qualitative)']);
 plotQualitativeConfusionMatrix(targets, outputs);
-figure('Name', ['Classified labels of ' classifierName ' (quantitative)']);
+figure('Name', ['Classified labels' nameSuffix ' (quantitative)']);
 plotQuantitativeConfusionMatrix(targets, outputs);
 end
 
