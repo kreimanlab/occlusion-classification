@@ -5,7 +5,7 @@ function plotExemplarCorrelationsOverTime(corrData)
 figure('Name', 'Similarity Exemplars');
 subplotRows = size(corrData.modelTimestepNames, 1);
 subplotCols = size(corrData.modelTimestepNames, 2);
-[labelNames, colors] = getLabelDescriptions();
+[labelNames, colors] = getCategoryLabels();
 for modelType = 1:size(corrData.modelTimestepNames, 1)
     for model = 1:size(corrData.modelTimestepNames, 2)
         subplot(subplotRows, subplotCols, ...
