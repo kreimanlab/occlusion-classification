@@ -1,20 +1,22 @@
-function figure6()
+function [corrData, totalFeatureDiffs] = figure6()
+
+timesteps = [1:30, 40:10:100];
 
 results = load('data/results/classification/all-libsvmccv.mat');
 results = results.results;
 rnnResults = convertRnnResults();
-rnnResults = mergeRnnResults(...
-    filterResults(results, @(r) strcmp(r.name, 'caffenet_fc7')), ...
-    rnnResults);
-% timeResults = load('data/results/classification/hoptimes_fullhopsize.mat');
-timeResults = load('data/results/classification/hoptimes-1_5_25.mat');
-timeResults = timeResults.results;
-timeResults = mergeResults(...
+timeResultsHop = load('data/results/classification/hoptimes-trainAll.mat');
+timeResultsHop = timeResultsHop.results;
+timeResultsHop = mergeResults(...
     filterResults(results, @(r) ismember(r.name, ...
     {'caffenet_fc7', 'caffenet_fc7-bipolar0'})), ... % include -1 (no bipolar)
     ...%{'caffenet_fc7'})), ...
-    filterResults(timeResults, @(r) cellfun(@(m) ~isempty(m), ...
-    regexp(r.name, 'caffenet_fc7-bipolar0-hop_t(1|6|11|16|21)-libsvmccv'))));
+    ...%timeResults);
+    filterResults(timeResultsHop, @(r) cellfun(@(m) ~isempty(m), ...
+    regexp(r.name, ['caffenet_fc7-bipolar0-hop_t(' ...
+    [sprintf('%d|', timesteps(1:end-1)), num2str(timesteps(end))] ...
+    ')-libsvmccv']))));
+timeResults = mergeRnnResults(timeResultsHop, rnnResults);
 
 figure('units', 'normalized', 'outerposition', [0 0 1 1]); % full-screen
 subplot(1, 3, 1);
@@ -23,14 +25,19 @@ fc7RnnHop = filterResults(results, @(r) ismember(r.name, ...
 displayResults(fc7RnnHop);
 
 subplot(1, 3, 2);
-plotOverallPerformanceOverTime(mergeRnnResults(timeResults, rnnResults));
+plotOverallPerformanceOverTime(timeResults);
+hold on;
+yyaxis right;
+totalFeatureDiffs = plotHopDiffsPrecomputed([0, 0, timesteps]);
+ylabel('Total absolute feature difference from previous timestep');
 
 subplot(1, 3, 3);
 corrResults = mergeRnnResults(...
-    filterResults(timeResults, @(r) cellfun(@(m) ~isempty(m), ...
-    regexp(r.name, '^caffenet_fc7(-bipolar0-hop_t(1|6|21)-libsvmccv)?$'))), ...
+    filterResults(timeResultsHop, @(r) cellfun(@(m) ~isempty(m), ...
+    regexp(r.name, '^caffenet_fc7-bipolar0-hop_t(1|20|100)-'))), ...
     filterResults(rnnResults, @(r) ismember(r.name, ...
     {'RNN_t0', 'RNN_t2', 'RNN_t4'})));
-plotModelHumanCorrelationOverTime(corrResults);
+corrData = collectModelHumanCorrelationData(corrResults);
+plotModelHumanCorrelationOverTime(corrData);
 end
 
