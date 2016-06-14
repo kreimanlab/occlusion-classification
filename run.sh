@@ -2,19 +2,23 @@
 
 case "$1" in
 "classification" | "identification")
-  queue="parallel -n 12"
-  fnc="run('$1')";
+  queue="parallel -n 8"
+  fnc="run('$1')"
   ;;
 "features")
   queue=long
-  fnc="computeFeatures()";
+  fnc="computeFeatures()"
   ;;
 "features-hoptime")
   queue=long
-  fnc="computeHopTimeFeatures()";
+  fnc="computeHopTimeFeatures()"
+  ;;
+"feature-diffs")
+  queue=priority
+  fnc="computeHopDiffs($2)"
   ;;
 *)
-  echo "Usage: ./run.sh <classification|identification|features|features-hoptime>"
+  echo "Usage: ./run.sh <classification|identification|features|features-hoptime|feature-diffs>"
   exit 1
   ;;
 esac
