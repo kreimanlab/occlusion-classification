@@ -1,15 +1,33 @@
-function plotHopDiffs(absDiffsPerFeature, absDiffsPerObject, absDiffsPerImage)
+function plotHopDiffs(timesteps, ...
+    totalAbsDiffs, absDiffsPerFeature, absDiffsPerObject, absDiffsPerImage)
+
 figure();
-subplot(1, 3, 1);
+subplot(1, 4, 1);
+plotHopConvergence(timesteps, totalAbsDiffs);
+xlabel('Time');
+ylabel('Total absolute difference');
+
+subplot(1, 4, 2);
 imagesc(absDiffsPerFeature');
 colorbar;
 title('features');
-subplot(1, 3, 2);
+xlabel('Time');
+ylabel('feature');
+set(gca, 'XTickLabel', '');
+
+subplot(1, 4, 3);
 imagesc(absDiffsPerImage');
 colorbar;
 title('images');
-subplot(1, 3, 3);
+xlabel('Time');
+ylabel('row');
+set(gca, 'XTickLabel', '');
+
+subplot(1, 4, 4);
 imagesc(absDiffsPerObject');
 colorbar;
 title('objects');
+xlabel('Time');
+ylabel('pres');
+set(gca, 'XTickLabel', '');
 end
