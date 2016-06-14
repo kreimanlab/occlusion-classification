@@ -11,9 +11,9 @@ names(labels == 4) = {'Fruits'};
 names(labels == 5) = {'Vehicles'};
 
 colors = cell(length(labels), 1);
-colors{labels == 1} = 'r';
-colors{labels == 2} = 'b';
-colors{labels == 3} = 'g';
-colors{labels == 4} = 'y'; %[1 0.9020 0.1608];
-colors{labels == 5} = 'm';
+colors(labels == 1) = {'r'};
+colors(labels == 2) = {'b'};
+colors(labels == 3) = {'g'};
+colors(labels == 4) = {'y'};
+colors(labels == 5) = {'m'};
 end
