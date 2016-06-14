@@ -1,5 +1,5 @@
 # data
-data/OcclusionModeling/deconv_plots/
+data/features/**
 
 ### Matlab template
 ##---------------------------------------------------
