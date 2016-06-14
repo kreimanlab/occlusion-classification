@@ -18,14 +18,13 @@ idx1 = subjects(randperm(length(subjects), round(length(subjects) / 2)));
 idx2 = setdiff(subjects, idx1);
 humanCorrectHalfs = NaN(length(presIds), 2);
 humanCorrect = NaN(length(presIds), 1);
-for i = 1:size(humanCorrectHalfs,1)
-    pres = presIds(i);
+for pres = presIds
     relevantResults = humanResults(humanResults.pres == pres, :);
-    humanCorrectHalfs(i,1) = mean(relevantResults.correct(...
+    humanCorrectHalfs(pres, 1) = mean(relevantResults.correct(...
         ismember(relevantResults.subject, idx1)));
-    humanCorrectHalfs(i,2) = mean(relevantResults.correct(...
+    humanCorrectHalfs(pres, 2) = mean(relevantResults.correct(...
         ismember(relevantResults.subject, idx2)));
-    humanCorrect(i) = mean(relevantResults.correct);
+    humanCorrect(pres) = mean(relevantResults.correct);
 end
 humanHumanCorrelation = corr(...
     humanCorrectHalfs(:,1), humanCorrectHalfs(:,2));
@@ -38,19 +37,18 @@ for model = 1:numel(modelTimestepNames)
     if isempty(modelTimestepNames{model})
         continue;
     end
-    for presIter = 1:length(presIds)
-        pres = presIds(presIter);
+    for pres = presIds
         relevantResults = modelResults(...
             strcmp(modelTimestepNames{model}, modelResults.name) & ...
             modelResults.pres == pres, :);
         assert(~isempty(relevantResults));
-        modelCorrect(presIter, model) = mean(relevantResults.correct);
+        modelCorrect(pres, model) = mean(relevantResults.correct);
     end
     modelHumanCorrelations(model) = corr(...
         modelCorrect(:, model), humanCorrect(:));
 end
 
 correlationData = CorrelationData(presIds, ...
-    humanResults, humanCorrect, ...
+    humanResults, humanCorrect, humanCorrectHalfs, ...
     modelNames, modelTimestepNames, timesteps, modelCorrect, ...
     humanHumanCorrelation, modelHumanCorrelations);

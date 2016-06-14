@@ -1,5 +1,8 @@
-function displayResults(results)
+function displayResults(results, getAccuracies)
 
+if ~exist('collectAccuracies', 'var')
+    getAccuracies = @collectAccuracies;
+end
 if ~iscell(results)
     results = {results};
 end
@@ -17,7 +20,7 @@ for iBlack = 1:length(percentsBlack)
     if iBlack < length(percentsBlack)
         percentBlackMax = percentsBlack(iBlack + 1);
     end
-    accuracies(iBlack, :, :) = collectAccuracies(results, ...
+    accuracies(iBlack, :, :) = getAccuracies(results, ...
         percentsBlack(iBlack), percentBlackMax, classifierNames);
 end
 dimKfolds = 3;
@@ -26,10 +29,6 @@ standardErrorOfTheMean = std(accuracies, 0, dimKfolds, 'omitnan') / ...
     sqrt(kfolds);
 
 %% Graph
-% rotate to properly display on pdf
-orient portrait;
-set(gcf, 'papersize', [11 8.5]);
-set(gcf, 'paperposition', [.25 .25 10.5 8]);
 % plots
 hold on;
 xlim([min(percentsVisible)-3, max(percentsVisible)+8]);

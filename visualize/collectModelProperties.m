@@ -1,7 +1,7 @@
 function [abbreviatedNames, timestepNames, timesteps] = ...
     collectModelProperties(modelResults)
 modelPrefixes = {'rnn', 'caffe'};
-typeAbbreviations = {'RNN', 'hop'};
+typeAbbreviations = getModelLabels();
 uniqueNames = sort(unique(modelResults.name));
 modelOccurrences = cell2mat(...
     cellfun(@(s) sum(cell2mat(strfind(lower(uniqueNames), s))), ...
@@ -11,7 +11,9 @@ rows = numel(abbreviatedNames);
 cols = max(modelOccurrences);
 timestepNames = cell(rows, cols);
 timesteps = NaN(rows, cols);
-for modelType = 1:length(abbreviatedNames)
+modelTypes = find(logical(modelOccurrences));
+for modelTypeIter = 1:length(modelTypes)
+    modelType = modelTypes(modelTypeIter);
     typePrefix = modelPrefixes{modelType};
     typeTimestepNames = uniqueNames(~cellfun(@isempty, ...
         strfind(lower(uniqueNames), typePrefix)));
@@ -19,8 +21,8 @@ for modelType = 1:length(abbreviatedNames)
         typeTimestepNames, 'UniformOutput', false));
     [typeTimesteps, sortIndices] = sort(typeTimesteps, 'ascend');
     typeTimestepNames = typeTimestepNames(sortIndices);
-    timestepNames(modelType, 1:length(typeTimestepNames)) = typeTimestepNames;
-    timesteps(modelType, 1:length(typeTimesteps)) = typeTimesteps;
+    timestepNames(modelTypeIter, 1:length(typeTimestepNames)) = typeTimestepNames;
+    timesteps(modelTypeIter, 1:length(typeTimesteps)) = typeTimesteps;
 end
 % shift RNN one to the right if -1 (unpolarized) in hop
 if(rows == 2 && all(timesteps(2, 1:2) == [-1, 0]) && isnan(timesteps(1, end)))

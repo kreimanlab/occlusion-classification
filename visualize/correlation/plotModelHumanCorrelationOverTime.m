@@ -9,10 +9,7 @@ plot(get(gca, 'xlim'), [corrData.humanHumanCorrelation corrData.humanHumanCorrel
     '-', 'Color', [1 0 0]);
 ylim([-0.65 1]);
 % labels
-xlabels = arrayfun(@(i) ...
-    strjoin(cellstr(num2str(corrData.timesteps(:, i))), '\n'), ...
-    1:size(corrData.timesteps, 2), ...
-    'UniformOutput', false);
+xlabels = makeXLabels(corrData.timesteps);
 my_xticklabels(1:length(xlabels), xlabels);
 set(gca,'TickDir', 'in');
 set(gca,'TickLength', [0.02 0.02]);
