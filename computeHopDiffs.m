@@ -29,7 +29,7 @@ for timeIter = 1:numel(timesteps)
             HopFeatures(t, BipolarFeatures(0, AlexnetFc7Features())))...
             .extractFeatures(dataSelection, RunType.Test, []);
     end
-    diff = features - reshape(prevNFeatures(1, :, :), size(features));
+    diff = features ~= reshape(prevNFeatures(1, :, :), size(features));
     absDiffs = abs(diff);
     absDiffsPerFeature(timeIter, :) = sum(absDiffs, 1);
     totalAbsDiffs(timeIter) = sum(absDiffsPerFeature(timeIter, :), 2);
