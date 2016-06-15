@@ -1,10 +1,13 @@
 function [totalAbsDiffs, absDiffsPerFeature, absDiffsPerObject, absDiffsPerImage] = ...
-    computeHopDiffs(timesteps, nBack)
+    computeHopDiffs(timesteps, nBack, diffFnc)
 if ~exist('timesteps', 'var')
     timesteps = [0, 1, 5, 20, 100];
 end
 if ~exist('nBack', 'var')
     nBack = 1;
+end
+if ~exist('diffFnc', 'var')
+    diffFnc = @minus;
 end
 
 data = load('data/data_occlusion_klab325v2.mat');
@@ -29,7 +32,7 @@ for timeIter = 1:numel(timesteps)
             HopFeatures(t, BipolarFeatures(0, AlexnetFc7Features())))...
             .extractFeatures(dataSelection, RunType.Test, []);
     end
-    diff = features ~= reshape(prevNFeatures(1, :, :), size(features));
+    diff = diffFnc(features, reshape(prevNFeatures(1, :, :), size(features)));
     absDiffs = abs(diff);
     absDiffsPerFeature(timeIter, :) = sum(absDiffs, 1);
     totalAbsDiffs(timeIter) = sum(absDiffsPerFeature(timeIter, :), 2);
