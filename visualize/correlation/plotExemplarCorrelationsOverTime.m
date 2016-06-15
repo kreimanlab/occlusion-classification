@@ -20,7 +20,7 @@ for modelType = 1:size(corrData.modelTimestepNames, 1)
                 find(corrData.humanResults.pres == pres, 1));
             plot(100 * corrData.humanCorrect(pres), ...
                 100 * corrData.modelCorrect(pres, modelType, model),...
-                '.', 'Color', colors(category), 'MarkerSize', 10);
+                '.', 'Color', colors{category}, 'MarkerSize', 10);
         end
         correlation = corr(corrData.modelCorrect(:, modelType, model), ...
             corrData.humanCorrect(:, 1));
@@ -33,7 +33,7 @@ for modelType = 1:size(corrData.modelTimestepNames, 1)
         if modelType == 1 && model == size(corrData.modelTimestepNames, 2)
             labelDummies = zeros(size(colors));
             for c = 1:length(colors)
-                labelDummies(c) = plot(NaN, NaN, colors(c));
+                labelDummies(c) = plot(NaN, NaN, colors{c});
             end
             leg = legend(labelDummies, labelNames, ...
                 'Orientation', 'horizontal');

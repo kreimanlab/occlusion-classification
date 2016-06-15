@@ -1,5 +1,5 @@
-function plotModelHumanCorrelationOverTime(corrData)
-%PLOTMODELHUMANCORRELATIONOVERTIME plots the overall correlations of model
+function plotCorrelationOverTime(corrData)
+%PLOTCORRELATIONOVERTIME plots the overall correlations of model
 %compared to human
 
 bar(corrData.modelHumanCorrelations', 'EdgeColor', 'none');
