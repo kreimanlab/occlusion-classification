@@ -23,6 +23,7 @@ classdef CategoryMedianFeatures < FeatureExtractor
                 for i = 1:length(uniqueLabels)
                     relevantRows = labels == uniqueLabels(i);
                     categoryCenter = median(features(relevantRows, :), 1);
+                    categoryCenter(categoryCenter == 0) = 1;
                     accumulatedFeatures(relevantRows, :) = ...
                         repmat(categoryCenter, sum(relevantRows), 1);
                 end
