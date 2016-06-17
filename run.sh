@@ -11,7 +11,7 @@ case "$1" in
   ;;
 "features-hoptime")
   queue=long
-  fnc="computeHopTimeFeatures()"
+  fnc="computeHopTimeFeatures($2)"
   ;;
 "feature-diffs")
   queue=priority

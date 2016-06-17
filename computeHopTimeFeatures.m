@@ -1,7 +1,8 @@
-function computeHopTimeFeatures()
+function computeHopTimeFeatures(savesteps)
 addpath(genpath(pwd));
-
-savesteps = [1:20, 30:10:100, 200:100:500];
+if ~exist('savesteps', 'var')
+    savesteps = [1:100, 110:10:300];
+end
 
 %% Setup
 featuresDir = 'data/features';
@@ -20,7 +21,8 @@ featureExtractor = HopFeatures(max(savesteps), ...
 % whole = fc7. just train hop network on whole.
 [~, wholePresRows] = unique(dataset, 'pres');
 fprintf('Training on %d whole objects\n', numel(wholePresRows));
-features = featureExtractor.extractFeatures(wholePresRows, RunType.Train, []);
+features = featureExtractor.extractFeatures(wholePresRows, ...
+    RunType.Train, dataset.truth(wholePresRows));
 for t = savesteps
     saveFeatures(features, wholeDir, ...
         featureExtractor, t, 1, 325);
@@ -30,8 +32,9 @@ for dataIter = 1:1000:length(dataset)
     fprintf('%s occluded %d/%d\n', featureExtractor.getName(), ...
         dataIter, length(dataset));
     dataEnd = dataIter + 999;
-    [~, ys] = featureExtractor.extractFeatures(dataIter:dataEnd, ...
-        RunType.Test, []);
+    rows = dataIter:dataEnd;
+    [~, ys] = featureExtractor.extractFeatures(rows, ...
+        RunType.Test, dataset.truth(rows));
     for t = savesteps
         features = ys(:, :, t);
         assert(size(features, 1) == dataEnd - dataIter + 1);
