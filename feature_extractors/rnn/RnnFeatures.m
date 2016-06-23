@@ -15,8 +15,8 @@ classdef RnnFeatures < FeatureExtractor
             obj.featuresInput = featuresInput;
         end
         
-        function name = getName(~)
-            name = 'RNN';
+        function name = getName(self)
+            name = ['RNN_features_fc7_noRelu_t' num2str(self.timesteps)];
         end
         
         function previousFeatures = extractFeatures(self, rows, runType, labels)

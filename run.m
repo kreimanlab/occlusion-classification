@@ -20,9 +20,9 @@ switch task
     otherwise
         error(['Unknown task ' task]);
 end
-fprintf(['Running %s with args '...
+fprintf(['Running %s in %s with args '...
     '(dataMin=%d, dataMax=%d, kfold=%d)\n'], ...
-    task, dataMin, dataMax, kfold);
+    task, pwd, dataMin, dataMax, kfold);
 
 addpath(genpath(pwd));
 

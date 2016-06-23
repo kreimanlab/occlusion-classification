@@ -17,9 +17,10 @@ classdef CategoryMedianFeatures < FeatureExtractor
         function features = extractFeatures(self, rows, runType, labels)
             features = self.featuresInput.extractFeatures(rows, runType);
             if runType == RunType.Train
+                assert(numel(labels) == numel(rows));
                 uniqueLabels = unique(labels);
                 accumulatedFeatures = ...
-                    zeros(length(labels), size(features, 2));
+                    NaN(length(labels), size(features, 2));
                 for i = 1:length(uniqueLabels)
                     relevantRows = labels == uniqueLabels(i);
                     categoryCenter = median(features(relevantRows, :), 1);
