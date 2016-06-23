@@ -1,11 +1,13 @@
-function plotHumanPerformance(percentsBlack)
-if ~exist('percentsBlack', 'var')
+function plotHumanPerformance(percentsBlack, dataset)
+if ~exist('percentsBlack', 'var') || isempty(percentsBlack)
     percentsBlack = [65:5:95, 99];
+end
+if ~exist('dataset', 'var')
+    dataset = load('data/data_occlusion_klab325v2.mat');
+    dataset = dataset.data;
 end
 
 percentsBlack = sort(percentsBlack);
-dataset = load('data/data_occlusion_klab325v2.mat');
-dataset = dataset.data;
 dataset = filterHumanData(dataset);
 [meanValues, standardErrorOfTheMean, ...
     percentBlackCenters, percentBlackRanges] = ...

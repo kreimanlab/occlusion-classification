@@ -36,21 +36,28 @@ xlim([min(percentsVisible) - 3, max(percentsVisible) + 8]);
 x = permute(repmat(percentsVisible, length(classifierNames), 1), [2 1]);
 xLeftError = repmat(percentsRanges(:, 1), 1, length(classifierNames));
 xRightError = repmat(percentsRanges(:, 2), 1, length(classifierNames));
-errorbarxy(x, meanValues, ...
+p = errorbarxy(x, meanValues, ...
     xLeftError, xRightError, ...
     standardErrorOfTheMean, standardErrorOfTheMean, 'o-');
+p = p.hMain;
 hold on;
-plot(get(gca,'xlim'), [chanceLevel chanceLevel], '--k');
-xlabel('Percent Visible');
-ylabel('Performance');
 % text labels
+modelColors = get(p, 'Color');
+if ~iscell(modelColors)
+    modelColors = {modelColors};
+end
 for i = 1:size(classifierNames)
     text(percentsVisible(1) + 1, meanValues(1, i), ...
-        strrep(classifierNames{i}, '_', '\_'));
+        strrep(classifierNames{i}, '_', '\_'), 'Color', modelColors{i});
 end
+% chance
+plot(get(gca,'xlim'), [chanceLevel chanceLevel], '--k');
 % human
 if chanceLevel == 20
     ylim([0 100]);
     plotHumanPerformance(percentsBlack);
 end
+xlabel('Percent Visible');
+ylabel('Performance');
+set(gcf, 'Color', 'w');
 hold off;
