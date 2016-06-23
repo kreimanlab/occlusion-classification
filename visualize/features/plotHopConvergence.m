@@ -1,7 +1,8 @@
-function plotHopConvergence(timesteps, totalAbsDiffs)
+function plotHopConvergence(timesteps, totalAbsDiffs, signChangesPerFeature)
 semilogy(timesteps, totalAbsDiffs, '-ok', 'MarkerSize', 2);
 hold on;
-zeroIndices = find(totalAbsDiffs == 0);
-scatter(timesteps(zeroIndices), totalAbsDiffs(zeroIndices), 'rx');
+convergenceIndices = find(~any(signChangesPerFeature));
+scatter(timesteps(convergenceIndices), ...
+    totalAbsDiffs(convergenceIndices), 'rx');
 ylabel('Total absolute feature difference from previous timestep');
 end

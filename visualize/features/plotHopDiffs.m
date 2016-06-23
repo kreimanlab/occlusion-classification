@@ -1,9 +1,10 @@
 function plotHopDiffs(timesteps, ...
-    totalAbsDiffs, absDiffsPerFeature, absDiffsPerObject, absDiffsPerImage)
+    totalAbsDiffs, absDiffsPerFeature, absDiffsPerObject, ...
+    absDiffsPerImage, signChangesPerFeature)
 
 figure();
 subplot(1, 4, 1);
-plotHopConvergence(timesteps, totalAbsDiffs);
+plotHopConvergence(timesteps, totalAbsDiffs, signChangesPerFeature);
 xlabel('Time');
 ylabel('Total absolute difference');
 

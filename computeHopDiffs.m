@@ -1,4 +1,5 @@
-function [totalAbsDiffs, absDiffsPerFeature, absDiffsPerObject, absDiffsPerImage] = ...
+function [totalAbsDiffs, absDiffsPerFeature, absDiffsPerObject, ...
+    absDiffsPerImage, signChangesPerFeature] = ...
     computeHopDiffs(timesteps, nBack, diffFnc)
 if ~exist('timesteps', 'var')
     timesteps = [0, 1, 5, 20, 100];
@@ -19,6 +20,7 @@ absDiffsPerImage = NaN([numel(timesteps), numel(dataSelection)]);
 absDiffsPerObject = NaN([numel(timesteps), numel(presIds)]);
 absDiffsPerFeature = NaN([numel(timesteps), 4096]);
 totalAbsDiffs = NaN([1, numel(timesteps)]);
+signChangesPerFeature = NaN([numel(timesteps), 4096]);
 prevNFeatures = NaN(nBack, length(dataSelection), 4096);
 for timeIter = 1:numel(timesteps)
     t = timesteps(timeIter);
@@ -32,7 +34,13 @@ for timeIter = 1:numel(timesteps)
             HopFeatures(t, BipolarFeatures(0, AlexnetFc7Features())))...
             .extractFeatures(dataSelection, RunType.Test, []);
     end
-    diff = diffFnc(features, reshape(prevNFeatures(1, :, :), size(features)));
+    prevFeatures = reshape(prevNFeatures(1, :, :), size(features));
+    % sign changes
+    signs = sign(features);
+    prevSigns = sign(prevFeatures);
+    signChangesPerFeature(timeIter, :) = sum(signs ~= prevSigns, 1);
+    % diffs
+    diff = diffFnc(features, prevFeatures);
     absDiffs = abs(diff);
     absDiffsPerFeature(timeIter, :) = sum(absDiffs, 1);
     totalAbsDiffs(timeIter) = sum(absDiffsPerFeature(timeIter, :), 2);
@@ -52,4 +60,4 @@ end
 save(['data/results/features/totalAbsDiffs-' ...
     datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS') '.mat'], ...
     'timesteps', 'totalAbsDiffs', 'absDiffsPerFeature', ...
-    'absDiffsPerImage', 'absDiffsPerObject');
+    'absDiffsPerImage', 'absDiffsPerObject', 'signChangesPerFeature');
