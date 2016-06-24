@@ -14,8 +14,8 @@ classdef RnnFeatureProvider < FeatureExtractor
                 occlusionData, originalExtractor)
             self.occlusionData = occlusionData;
             self.originalExtractor = originalExtractor;
-            featuresFile = ['./data/features/' ...
-                originalExtractor.getName() '.mat'];
+            dir = getFeaturesDirectory();
+            featuresFile = [dir, originalExtractor.getName() '.mat'];
             self.features = load(featuresFile);
             self.features = self.features.features;
         end

@@ -10,12 +10,7 @@ classdef FeatureProvider < FeatureExtractor
         function self = FeatureProvider(...
                 occlusionData, dataSelection, originalExtractor)
             self.originalExtractor = originalExtractor;
-            dir = './data/features/';
-            % use central cluster directory if possible
-            orchestraDir = '/groups/kreiman/martin/features/';
-            if exist(orchestraDir, 'dir')
-                dir = orchestraDir;
-            end
+            dir = getFeaturesDirectory();
             [filePrefix, fileSuffix, loadFeatures] = ...
                 self.getFileDirectives(originalExtractor);
             self.caches = containers.Map(...
