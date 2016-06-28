@@ -3,7 +3,11 @@
 case "$1" in
 "classification" | "identification")
   queue="parallel -n 8"
-  fnc="run('$1')"
+  if [ -z "$2" ]; then
+    fnc="run('$1')"
+  else
+    fnc="run('$1', $2)"
+  fi
   ;;
 "features")
   queue=long

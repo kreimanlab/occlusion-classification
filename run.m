@@ -3,15 +3,17 @@ function run(varargin)
 %% Parameters
 argParser = inputParser();
 argParser.KeepUnmatched = true;
-argParser.addRequired('task', @isstr); % classification / identification
-argParser.addOptional('dataMin', 1, @isnumeric);
-argParser.addOptional('dataMax', 13000, @isnumeric);
-argParser.addOptional('kfold', 5, @isnumeric);
+argParser.addRequired('task', @isstr);
+argParser.addParameter('dataMin', 1, @isnumeric);
+argParser.addParameter('dataMax', 13000, @isnumeric);
+argParser.addParameter('kfold', 5, @isnumeric);
+argParser.addParameter('excludeCategories', [], @isnumeric);
 argParser.parse(varargin{:});
 task = argParser.Results.task;
 dataMin = argParser.Results.dataMin;
 dataMax = argParser.Results.dataMax;
 kfold = argParser.Results.kfold;
+excludedCategories = argParser.Results.excludeCategories;
 switch task
     case 'classification'
         getLabels = @(dataset, rows) dataset.truth(rows);
@@ -20,9 +22,8 @@ switch task
     otherwise
         error(['Unknown task ' task]);
 end
-fprintf(['Running %s in %s with args '...
-    '(dataMin=%d, dataMax=%d, kfold=%d)\n'], ...
-    task, pwd, dataMin, dataMax, kfold);
+fprintf('Running %s in %s with args:\n', task, pwd);
+disp(argParser.Results);
 
 addpath(genpath(pwd));
 
@@ -31,8 +32,9 @@ addpath(genpath(pwd));
 dataset = load('data_occlusion_klab325v2.mat');
 dataset = dataset.data;
 dataSelection = dataMin:dataMax;
-dataset = dataset(dataSelection, :);
-wholeImagePres = unique(dataset.pres(:));
+dataSelection = dataSelection(...
+    ~ismember(dataset.truth(dataSelection), excludedCategories));
+objectPres = unique(dataset.pres(dataSelection));
 % feature extractors + classifier
 featureProviderFactory = FeatureProviderFactory(dataset, dataSelection);
 hop = curry(@HopFeatures, 10);
@@ -52,11 +54,12 @@ classifiers = cellfun(@(featureExtractor) LibsvmClassifierCCV(featureExtractor),
 rng(1, 'twister'); % seed, use pseudo random generator for reproducibility
 
 %% Run
-evaluateClassifiers = curry(@evaluate, task, dataset, classifiers, getLabels);
+evaluateClassifiers = curry(@evaluate, task, dataset, ...
+    classifiers, getLabels);
 parallelPoolObject = parpool; % init parallel computing pool
 crossValStream = RandStream('mlfg6331_64');
 reset(crossValStream);
-results = crossval(evaluateClassifiers, wholeImagePres, 'kfold', kfold, ...
+results = crossval(evaluateClassifiers, objectPres, 'kfold', kfold, ...
     'Options', statset('UseParallel', true, ...
     'Streams', crossValStream, 'UseSubstreams', true));
 delete(parallelPoolObject); % teardown pool
