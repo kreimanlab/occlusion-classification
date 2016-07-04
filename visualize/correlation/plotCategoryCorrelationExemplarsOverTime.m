@@ -51,8 +51,8 @@ for categoryIter = 1:numel(categories)
         humanCorrectHalfs(categoryIter, :, half) = ...
             corrData.humanCorrectHalfs(categoriesPres(categoryIter, :), half);
     end
-    half1 = reshape(humanCorrectHalfs(categoryIter, :, 1), [presPerCategory 1]);
-    half2 = reshape(humanCorrectHalfs(categoryIter, :, 2), [presPerCategory 1]);
+    half1 = squeeze(humanCorrectHalfs(categoryIter, :, 1));
+    half2 = squeeze(humanCorrectHalfs(categoryIter, :, 2));
     assert(isequal(size(half1), size(half2)));
     humanHumanCorrs(categoryIter) = corr(half1, half2);
     
@@ -63,8 +63,8 @@ for categoryIter = 1:numel(categories)
     title(sprintf('corr = %.2f', humanHumanCorrs(categoryIter)));
 end
 subplot(1, numel(categories) + 1, numel(categories) + 1);
-plot(100 * reshape(humanCorrectHalfs(:, :, 1), [presPerCategory * numel(categories) 1]), ...
-    100 * reshape(humanCorrectHalfs(:, :, 2), [presPerCategory * numel(categories) 1]), ...
+plot(100 * squeeze(humanCorrectHalfs(:, :, 1)), ...
+    100 * squeeze(humanCorrectHalfs(:, :, 2)), ...
     '.', 'Color', [0.7 0.7 0.7], 'MarkerSize', 10);
 hold on; lsline; hold off;
 title(sprintf('mean corr = %.2f', mean(humanHumanCorrs(:))));
@@ -83,8 +83,8 @@ for model = 1:numel(corrData.modelNames)
         for categoryIter = 1:numel(categoryLabels)
             modelCorrect(categoryIter, model, timeIter, :) = corrData.modelCorrect(...
                 categoriesPres(categoryIter, :), model, timeIter);
-            modelData = reshape(modelCorrect(categoryIter, model, timeIter, :), [presPerCategory 1]);
-            humanData = reshape(humanCorrect(categoryIter, :), [presPerCategory 1]);
+            modelData = squeeze(modelCorrect(categoryIter, model, timeIter, :));
+            humanData = squeeze(humanCorrect(categoryIter, :));
             subplot(numRows, numCols, (timeIter - 1) * numCols + categoryIter);
             plot(100 * humanData, 100 * modelData, ...
                 '.', 'Color', colors{categoryIter}, 'MarkerSize', 10);

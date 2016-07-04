@@ -1,9 +1,10 @@
-function results = plotRnnTrain1CatResults(file)
+function plotRnnTrain1CatResults(file)
 if ~exist('file', 'var')
-    file = 'data/results/classification/data_occlusion_klab325v2_with_models.mat';
+    file = 'data/results/classification/data_occlusion_klab325v2_with_train1cat.mat';
 end
 results = load(file);
 results = results.data;
+results.correct = results.train1cat_mean_correct;
 results.name = repmat({'RNN_train1cat'}, [size(results, 1) 1]);
 displayResults(results, @collectAccuracies);
 end

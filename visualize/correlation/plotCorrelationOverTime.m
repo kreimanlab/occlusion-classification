@@ -20,6 +20,7 @@ for i = 1:size(corrData.modelNames, 1)
 end
 xlabel('Time step');
 ylabel('Corr. with Human');
+set(gcf, 'Color', 'w');
+box off;
 hold off;
-
 end

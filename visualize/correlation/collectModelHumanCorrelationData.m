@@ -33,22 +33,30 @@ humanHumanCorrelation = corr(...
     collectModelProperties(modelResults);
 modelHumanCorrelations = NaN(size(modelTimestepNames));
 modelCorrect = NaN([length(presIds), size(modelTimestepNames)]); % pres x type x model
-for model = 1:numel(modelTimestepNames)
-    if isempty(modelTimestepNames{model})
-        continue;
+[~, exemplarsPerPres] = mode(modelResults.pres);
+exemplarsPerPres = exemplarsPerPres / numel(modelTimestepNames);
+modelCorrectExemplars = NaN([length(presIds), size(modelTimestepNames), exemplarsPerPres]);
+for model = 1:size(modelTimestepNames, 1)
+    for timeIter = 1:size(modelTimestepNames, 2)
+        if isempty(modelTimestepNames{model, timeIter})
+            continue;
+        end
+        for pres = presIds
+            relevantResults = modelResults(...
+                strcmp(modelTimestepNames{model, timeIter}, modelResults.name) & ...
+                modelResults.pres == pres, :);
+            assert(~isempty(relevantResults));
+            assert(size(relevantResults, 1) == exemplarsPerPres);
+            modelCorrectExemplars(pres, model, timeIter, :) = relevantResults.correct;
+            modelCorrect(pres, model, timeIter) = mean(relevantResults.correct);
+        end
+        modelHumanCorrelations(model, timeIter) = corr(...
+            modelCorrect(:, model, timeIter), humanCorrect(:));
     end
-    for pres = presIds
-        relevantResults = modelResults(...
-            strcmp(modelTimestepNames{model}, modelResults.name) & ...
-            modelResults.pres == pres, :);
-        assert(~isempty(relevantResults));
-        modelCorrect(pres, model) = mean(relevantResults.correct);
-    end
-    modelHumanCorrelations(model) = corr(...
-        modelCorrect(:, model), humanCorrect(:));
 end
 
 correlationData = CorrelationData(presIds, ...
     humanResults, humanCorrect, humanCorrectHalfs, ...
-    modelNames, modelTimestepNames, timesteps, modelCorrect, ...
+    modelNames, modelTimestepNames, timesteps, ...
+    modelCorrect, modelCorrectExemplars, ...
     humanHumanCorrelation, modelHumanCorrelations);
