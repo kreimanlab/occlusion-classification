@@ -1,6 +1,6 @@
 function accuracies = collectAccuracies(results, ...
     percentBlackMin, percentBlackMax, classifierNames)
-accuracies = zeros(length(classifierNames), length(results));
+accuracies = NaN(length(classifierNames), length(results));
 for iCls = 1:length(classifierNames)
     for ikfold = 1:length(results)
         currentData = results{ikfold};
@@ -13,4 +13,3 @@ for iCls = 1:length(classifierNames)
     end
 end
 end
-

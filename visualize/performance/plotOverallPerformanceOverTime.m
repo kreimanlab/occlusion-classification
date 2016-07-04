@@ -11,18 +11,18 @@ for i = 1:numel(timesteps)
     performances(i) = mean(currentResults.correct);
 end
 performances = performances * 100;
+plots = plotWithScaledX(timesteps, performances);
+hold on;
 for modelType = 1:numel(modelNames)
-    p = plot(performances(modelType, :), 'o-');
-    hold on;
-    text(length(timesteps(modelType, :))-1, ...
+    text(length(timesteps(modelType, :)) - 1, ...
         mean(performances(modelType, :), 'omitnan'), ...
-        modelNames{modelType}, 'Color', get(p, 'Color'));
+        modelNames{modelType}, 'Color', get(plots{modelType}, 'Color'));
 end
-xlabels = makeXLabels(timesteps);
-my_xticklabels(1:length(xlabels), xlabels);
 xlabel('Time step');
 ylabel('Performance');
 ylim([0 100]);
 plotOverallHumanPerformance();
+set(gcf, 'Color', 'w');
+box off;
 hold off;
 end

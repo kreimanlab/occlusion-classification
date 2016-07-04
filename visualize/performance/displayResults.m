@@ -10,17 +10,14 @@ end
 %% Prepare
 percentsBlack = [65:5:95, 99];
 percentsVisible = NaN(size(percentsBlack));
-percentsRanges = NaN([numel(percentsVisible), 2]); % range x left, right
 kfolds = length(results);
 classifierNames = unique(results{1}.name);
 chanceLevel = 100 / length(unique(results{1}.truth));
-accuracies = zeros(length(percentsVisible), length(classifierNames), ...
+accuracies = NaN(length(percentsVisible), length(classifierNames), ...
     kfolds);
 for iBlack = 1:length(percentsBlack)
-    [blackMin, blackMax, blackCenter, rangeLeft, rangeRight] = ...
+    [blackMin, blackMax, blackCenter] = ...
         getPercentBlackRange(percentsBlack, iBlack);
-    percentsRanges(iBlack, 1) = rangeLeft;
-    percentsRanges(iBlack, 2) = rangeRight;
     percentsVisible(iBlack) = 100 - blackCenter;
     accuracies(iBlack, :, :) = getAccuracies(results, ...
         blackMin, blackMax, classifierNames);
@@ -34,12 +31,7 @@ standardErrorOfTheMean = std(accuracies, 0, dimKfolds, 'omitnan') / ...
 % plots
 xlim([min(percentsVisible) - 3, max(percentsVisible) + 8]);
 x = permute(repmat(percentsVisible, length(classifierNames), 1), [2 1]);
-xLeftError = repmat(percentsRanges(:, 1), 1, length(classifierNames));
-xRightError = repmat(percentsRanges(:, 2), 1, length(classifierNames));
-p = errorbarxy(x, meanValues, ...
-    xLeftError, xRightError, ...
-    standardErrorOfTheMean, standardErrorOfTheMean, 'o-');
-p = p.hMain;
+p = errorbar(x, meanValues, standardErrorOfTheMean, 'o-');
 hold on;
 % text labels
 modelColors = get(p, 'Color');
