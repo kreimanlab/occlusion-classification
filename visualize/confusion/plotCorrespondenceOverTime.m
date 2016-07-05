@@ -1,11 +1,18 @@
 function [modelHumanCorrs, humanHumanCorrespondence] = ...
-    plotCorrespondenceOverTime(modelResults)
+    plotCorrespondenceOverTime(modelResults, modelField, humanField)
+if ~exist('modelField', 'var')
+    modelField = 'correct';
+end
+if ~exist('humanField', 'var')
+    humanField = modelField;
+end
+rng(0, 'twister');
 modelResults = collapseResults(modelResults);
 
 %% human-human
 humanResults = load('data/data_occlusion_klab325v2.mat');
 [humanResults, relevantRows] = filterHumanData(humanResults.data);
-humanHumanCorrespondence = calculateHumanHuman(humanResults);
+humanHumanCorrespondence = calculateHumanHuman(humanResults, humanField);
 
 %% model-human
 [modelNames, modelTimestepNames, timesteps] = ...
@@ -21,11 +28,11 @@ for modelIter = 1:size(modelTimestepNames, 1)
         currentResults = arrayfun(@(row) currentResults(...
             currentResults.testrows == row, :), find(relevantRows), ...
             'UniformOutput', false);
-        currentResults = vertcat(currentResults{:});
+        currentResults = collapseResults(currentResults);
         assert(isequal(size(currentResults, 1), size(humanResults, 1)));
         assert(all(currentResults.pres == humanResults.pres));
         modelHumanCorrs(modelIter, timeIter) = getCorrespondence(...
-            humanResults.correct, currentResults.correct);
+            humanResults.(humanField), currentResults.(modelField));
     end
 end
 
@@ -47,6 +54,7 @@ hold off;
 end
 
 function corr = getCorrespondence(targets, outputs)
+assert(isequal(size(targets), size(outputs)));
 targets = double(targets); outputs = double(outputs);
 if all(targets == outputs)
     % catch the case where we only have one distinct class (e.g. only 1s)
@@ -57,48 +65,62 @@ C = confusionmat(targets, outputs);
 corr = sum(diag(C)) / sum(C(:));
 end
 
-function humanHumanCorrespondence = calculateHumanHuman(data)
+function humanHumanCorrespondence = calculateHumanHuman(data, humanField)
 subjects = unique(data.subject);
-presIds = unique(data.pres)';
-idx1 = subjects(randperm(length(subjects), round(length(subjects) / 2)));
-idx2 = setdiff(subjects, idx1);
-humanCorrectHalfs = NaN(length(presIds), 2);
-humanCorrect = NaN(length(presIds), 1);
-for pres = presIds
-    relevantResults = data(data.pres == pres, :);
-    humanCorrectHalfs(pres, 1) = mean(relevantResults.correct(...
-        ismember(relevantResults.subject, idx1)));
-    humanCorrectHalfs(pres, 2) = mean(relevantResults.correct(...
-        ismember(relevantResults.subject, idx2)));
-    humanCorrect(pres) = mean(relevantResults.correct);
+subjectHalf1 = subjects(randperm(length(subjects), round(length(subjects) / 2)));
+subjectHalf2 = setdiff(subjects, subjectHalf1);
+targets = cell(1);
+outputs = cell(1);
+iter = 1;
+for subject = subjectHalf1'
+    subjectPres = data.pres(data.subject == subject);
+    for pres = subjectPres'
+        targetData = data(...
+            data.subject == subject & data.pres == pres, :);
+        assert(size(targetData, 1) == 1);
+        compareData = data(ismember(data.subject, subjectHalf2) & ...
+            data.pres == pres, :);
+        if isempty(compareData)
+            continue; % ignore if no pres-match found
+        end
+        compareData = findHumanCompareData(targetData, compareData);        
+        targets{iter} = targetData.(humanField);
+        outputs{iter} = compareData.(humanField);
+        iter = iter + 1;
+    end
+end
+targets = cell2mat(reshape(targets, [numel(targets), 1]));
+outputs = cell2mat(reshape(outputs, [numel(outputs), 1]));
+humanHumanCorrespondence = getCorrespondence(targets, outputs);
 end
 
-
-combinations = nchoosek(subjects, 2);
-% TODO: how to find row2 of subject2 relating to row1 of subject1?
-% * pres equal
-% * closest visibility
-% * closest euclidean distance of bubble centers
-humanHumanCorrs = NaN(size(combinations, 1), 1);
-for i = 1:size(combinations, 1)
-    % get rows
-    rows1 = find(data.subject == combinations(i, 1));
-    rows2 = find(data.subject == combinations(i, 2));
-    % assert no duplicates
-    assert(numel(unique(data.pres(rows1))) == numel(data.pres(rows1)));
-    assert(numel(unique(data.pres(rows2))) == numel(data.pres(rows2)));
-    % remove objects that were not presented to the other subject
-    rows1(~ismember(data.pres(rows1), data.pres(rows2))) = [];
-    rows2(~ismember(data.pres(rows2), data.pres(rows1))) = [];
-    % align
-    [~, sortedIndeces1] = sort(data.pres(rows1));
-    rows1 = rows1(sortedIndeces1);
-    [~, sortedIndeces2] = sort(data.pres(rows2));
-    rows2 = rows2(sortedIndeces2);
-    assert(~isempty(rows1) && ~isempty(rows2));
-    assert(all(data.pres(rows1) == data.pres(rows2)));
-    humanHumanCorrs(i) = getCorrespondence(...
-        data.correct(rows1), data.correct(rows2));
+function compareData = findHumanCompareData(targetData, searchData)
+searchBubbles = arrayfun(@(i) ...
+    searchData.bubble_centers(i, 1:searchData.nbubbles(i)), ...
+    1:size(searchData, 1), 'UniformOutput', false)';
+distances = bubbleDistances(...
+    targetData.bubble_centers(1:targetData.nbubbles), ...
+    searchBubbles);
+distances = sum(distances, 2);
+[~, row] = min(distances);
+compareData = searchData(row, :);
 end
-humanHumanCorrespondence = mean(humanHumanCorrs);
+
+function distances = bubbleDistances(...
+    sourceBubbleCenters, compareBubbleCenters)
+distances = NaN(size(compareBubbleCenters, 1), numel(sourceBubbleCenters));
+for i = 1:size(compareBubbleCenters, 1)
+    for b = 1:numel(sourceBubbleCenters)
+        distances(i, b) = min(arrayfun(@(compareBubble) bubbleDistance(...
+            sourceBubbleCenters(b), compareBubble), ...
+            compareBubbleCenters{i}));
+    end
+end
+end
+
+function distance = bubbleDistance(bubble1, bubble2)
+    imageSize = [256, 256];
+    [y1, x1] = ind2sub(imageSize, bubble1);
+    [y2, x2] = ind2sub(imageSize, bubble2);
+    distance = pdist2([x1, y1], [x2, y2]);
 end

@@ -1,5 +1,6 @@
 function [abbreviatedNames, timestepNames, timesteps] = ...
     collectModelProperties(modelResults)
+modelResults = collapseResults(modelResults);
 modelPrefixes = {'rnn', 'caffe', 'train1cat'};
 typeAbbreviations = getModelLabels();
 uniqueNames = sort(unique(modelResults.name));

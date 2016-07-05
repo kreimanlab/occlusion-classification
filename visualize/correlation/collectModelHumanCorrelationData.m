@@ -1,10 +1,7 @@
 function correlationData = collectModelHumanCorrelationData(modelResults)
 %COLLECTMODELHUMANCORRELATIONDATA Collect correlations between model and
 %human
-
-if iscell(modelResults)
-    modelResults = vertcat(modelResults{:});
-end
+modelResults = collapseResults(modelResults);
 
 presIds = 1:300;
 % human
@@ -33,9 +30,6 @@ humanHumanCorrelation = corr(...
     collectModelProperties(modelResults);
 modelHumanCorrelations = NaN(size(modelTimestepNames));
 modelCorrect = NaN([length(presIds), size(modelTimestepNames)]); % pres x type x model
-[~, exemplarsPerPres] = mode(modelResults.pres);
-exemplarsPerPres = exemplarsPerPres / numel(modelTimestepNames);
-modelCorrectExemplars = NaN([length(presIds), size(modelTimestepNames), exemplarsPerPres]);
 for model = 1:size(modelTimestepNames, 1)
     for timeIter = 1:size(modelTimestepNames, 2)
         if isempty(modelTimestepNames{model, timeIter})
@@ -46,8 +40,6 @@ for model = 1:size(modelTimestepNames, 1)
                 strcmp(modelTimestepNames{model, timeIter}, modelResults.name) & ...
                 modelResults.pres == pres, :);
             assert(~isempty(relevantResults));
-            assert(size(relevantResults, 1) == exemplarsPerPres);
-            modelCorrectExemplars(pres, model, timeIter, :) = relevantResults.correct;
             modelCorrect(pres, model, timeIter) = mean(relevantResults.correct);
         end
         modelHumanCorrelations(model, timeIter) = corr(...
@@ -58,5 +50,5 @@ end
 correlationData = CorrelationData(presIds, ...
     humanResults, humanCorrect, humanCorrectHalfs, ...
     modelNames, modelTimestepNames, timesteps, ...
-    modelCorrect, modelCorrectExemplars, ...
+    modelCorrect, ...
     humanHumanCorrelation, modelHumanCorrelations);

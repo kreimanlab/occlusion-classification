@@ -2,7 +2,6 @@ function plotExemplarCorrelationsOverTime(corrData)
 %PLOTEXEMPLARCORRELATIONSOVERTIME plots exemplar correlations 
 %("point-cloud") of model compared to human over time
 
-figure('Name', 'Similarity Exemplars');
 subplotRows = size(corrData.modelTimestepNames, 1);
 subplotCols = size(corrData.modelTimestepNames, 2);
 [labelNames, colors] = getCategoryLabels();

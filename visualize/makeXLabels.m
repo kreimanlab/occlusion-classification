@@ -1,4 +1,12 @@
-function [xlabels, xticks] = makeXLabels(xticks, timesteps)
+function [xlabels, xticks] = makeXLabels(timesteps, xticks)
+if ~exist('xticks', 'var')
+    xlabels = arrayfun(@(i) ...
+        strjoin(cellstr(makeStrPlain(timesteps(:, i))), '\n'), ...
+        1:size(timesteps, 2), ...
+        'UniformOutput', false);
+    return;
+end
+
 assert(size(xticks, 1) == size(timesteps, 1));
 % remove duplicates
 for row = 1:size(timesteps, 1)
@@ -37,8 +45,15 @@ end
 function str = makeStr(timesteps)
 str = repmat(' ', size(timesteps, 1), 3);
 for row = 1:size(timesteps, 1)
-    if ~isempty(timesteps{row}) && ~isnan(timesteps{row})
+    if ~isempty(timesteps{row}) && ~any(isnan(timesteps{row}))
         str(row, :) = sprintf('%3d', timesteps{row});
     end
+end
+end
+
+function str = makeStrPlain(timestep)
+str = num2str(timestep);
+for row = 1:size(str, 1)
+    str(row, :) = strrep(str(row, :), 'NaN', '   ');
 end
 end

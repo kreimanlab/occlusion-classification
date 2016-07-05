@@ -1,9 +1,13 @@
-function plotConfusionMatrix(targets, outputs, xlabelText, ylabelText)
+function plotConfusionMatrix(targets, outputs, ...
+    xlabelText, ylabelText, classes)
 if ~exist('xlabelText', 'var')
     xlabelText = 'Targets';
 end
 if ~exist('ylabelText', 'var')
     ylabelText = 'Outputs';
+end
+if ~exist('classes', 'var')
+    classes = getCategoryLabels();
 end
 %% compute
 C = confusionmat(targets, outputs);
@@ -29,18 +33,24 @@ line([0.5, size(C, 2) + 0.5], repmat(size(C, 1) - 0.5, [1, 2]), ...
 % labels
 xlabel(xlabelText);
 ylabel(ylabelText);
-categories = getCategoryLabels();
 set(gca, 'xaxisLocation', 'top');
-set(gca, 'XTick', 1:numel(categories));
-set(gca, 'YTick', 1:numel(categories));
-set(gca, 'XTickLabel', categories);
-set(gca, 'YTickLabel', categories);
+set(gca, 'XTick', 1:numel(classes));
+set(gca, 'YTick', 1:numel(classes));
+set(gca, 'XTickLabel', classes);
+set(gca, 'YTickLabel', classes);
 % text
 [xs, ys] = meshgrid(1:size(C, 1), 1:size(C, 2));
-textString = arrayfun(@(i) sprintf('%.2f%%', i), 100 * C, ...
+textString = arrayfun(@(i) sprintf('%.0f%%', i), 100 * C, ...
     'UniformOutput', false);
+textColors = cell(size(C));
+textColors((C  / max(C(:))) > 0.5) = {'w'};
+textColors((C  / max(C(:))) <= 0.5) = {'k'};
+if numel(classes) <= 2
+    xs = xs - 0.15;
+else
+    xs = xs - 0.2;
+end
 for i = 1:numel(xs)
-text(xs(i) - 0.25, ys(i), textString(i), ...
-    'Color', repmat(C(i) / max(C(:)), [1, 3]));
+text(xs(i), ys(i), textString(i), 'Color', textColors{i});
 end
 end

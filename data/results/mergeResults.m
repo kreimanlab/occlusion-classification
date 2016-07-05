@@ -1,8 +1,18 @@
-function mergedResults = mergeResults(results1, results2)
-assert(length(results1) == length(results2));
-mergedResults = cell(length(results1), 1);
-for i = 1:length(mergedResults)
-    r1 = results1{i}; r2 = results2{i};
-    mergedResults{i} = [r1; r2];
-end
+function results = mergeResults(varargin)
+for resIter = 1:numel(varargin)
+    res = varargin{resIter};
+    if ~iscell(res)
+        res = {res};
+    end
+    if ~exist('results', 'var')
+        results = res;
+    else
+        assert(numel(results) == numel(res));
+        for i = 1:numel(results)
+            r1 = results{i}; r2 = res{i};
+            results{i} = table2dataset(outerjoin(...
+                dataset2table(r1), dataset2table(r2), ...
+                'MergeKeys', true));
+        end
+    end
 end

@@ -11,7 +11,6 @@ classdef CorrelationData
         modelTimestepNames
         timesteps
         modelCorrect
-        modelCorrectExemplars
         
         humanHumanCorrelation
         modelHumanCorrelations
@@ -21,7 +20,7 @@ classdef CorrelationData
         function obj = CorrelationData(presIds, ...
                 humanResults, humanCorrect, humanCorrectHalfs, ...
                 modelNames, modelTimestepNames, timesteps, ...
-                modelCorrect, modelCorrectExemplars, ...
+                modelCorrect, ...
                 humanHumanCorrelation, modelHumanCorrelations)
             obj.presIds = presIds;
             
@@ -33,7 +32,6 @@ classdef CorrelationData
             obj.modelTimestepNames = modelTimestepNames;
             obj.timesteps = timesteps;
             obj.modelCorrect = modelCorrect;
-            obj.modelCorrectExemplars = modelCorrectExemplars;
             
             obj.humanHumanCorrelation = humanHumanCorrelation;
             obj.modelHumanCorrelations = modelHumanCorrelations;
