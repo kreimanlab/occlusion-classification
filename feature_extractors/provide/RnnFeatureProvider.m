@@ -14,10 +14,7 @@ classdef RnnFeatureProvider < FeatureExtractor
                 occlusionData, originalExtractor)
             self.occlusionData = occlusionData;
             self.originalExtractor = originalExtractor;
-            dir = getFeaturesDirectory();
-            featuresFile = [dir, originalExtractor.getName() '.mat'];
-            self.features = load(featuresFile);
-            self.features = self.features.features;
+            self.features = self.loadFeatures(self.originalExtractor);
         end
         
         function name = getName(self)
@@ -32,6 +29,34 @@ classdef RnnFeatureProvider < FeatureExtractor
                 case RunType.Test
                     features = self.features(325 + ids, :);
             end
+        end
+    end
+    
+    methods (Access = private)
+        function features = loadFeatures(self, originalExtractor)
+            [featuresFile, filetype] = self.findFeaturesFile(...
+                originalExtractor.getName());
+            if strcmp(filetype, 'mat')
+                features = load(featuresFile);
+                features = features.features;
+            elseif strcmp(filetype, 'txt')
+                features = dlmread(featuresFile, ' ');
+            else
+                error('Unknown filetype %s', filetype);
+            end
+        end
+        
+        function [featuresFile, filetype] = ...
+                findFeaturesFile(~, extractorName)
+            dir = getFeaturesDirectory();
+            possibleExtensions = {'mat', 'txt'};
+            for filetype = possibleExtensions
+                featuresFile = [dir, extractorName, '.', filetype{:}];
+                if exist(featuresFile, 'file') == 2
+                    return;
+                end
+            end
+            error('file %s not found in directory %s', extractorName, dir);
         end
     end
 end

@@ -39,20 +39,18 @@ def run(model, X, num_timesteps=6):
     return Y
 
 
-def load_occluded_features():
+def load_occluded_features(features_directory):
     features = np.zeros((13000, feature_size))
-    for i in range(1, 13000, 1000):
-        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                "../../data/features/data_occlusion_klab325v2/",
+    for i in range(1, features.shape[0], 1000):
+        filename = os.path.join(features_directory, "data_occlusion_klab325v2",
                                 "caffenet_fc7_ims_%d-%d.txt" % (i, i + 999))
         _features = np.loadtxt(filename, usecols=range(1, feature_size + 1))
         features[i - 1:i - 1 + 1000, :] = _features
     return features
 
 
-def load_whole_features():
-    filename = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                            "../../data/features/klab325_orig/",
+def load_whole_features(features_directory):
+    filename = os.path.join(features_directory, "klab325_orig",
                             "caffenet_fc7_ims_1-325.txt")
     features = np.loadtxt(filename, usecols=range(1, feature_size + 1))
     return features
@@ -69,15 +67,32 @@ def align_features(whole_features, occluded_features):
     return aligned_whole
 
 
+def get_features_directory():
+    central_dir = "/groups/kreiman/martin/features"
+    if os.path.exists(central_dir):
+        return central_dir
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../data/features")
+
+
+def load_data():
+    features_directory = get_features_directory()
+    Y = load_whole_features(features_directory)
+    X = load_occluded_features(features_directory)
+    Y = align_features(Y, X)
+    return X, Y
+
+
 if __name__ == '__main__':
     random.seed(0)
     feature_size = 4096
     model = create_model()
     # data
-    Y = load_whole_features()
-    X = load_occluded_features()
-    Y = align_features(Y, X)
+    X, Y = load_data()
     # TODO: cross validation across objects/categories
-    model = train(model, X, Y, num_epochs=1000)
+    model = train(model, X, Y, num_epochs=30)
     predicted_Y = run(model, X)
-    np.savetxt('predicted_Y.txt', predicted_Y)
+    for timestep, prediction in predicted_Y.items():
+        features = np.concatenate((Y, prediction))
+        filename = 'RnnFeatures-timestep%d.txt' % timestep
+        filepath = os.path.join(get_features_directory(), filename)
+        np.savetxt(filepath, prediction)
