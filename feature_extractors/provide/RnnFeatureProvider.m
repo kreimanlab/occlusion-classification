@@ -6,7 +6,8 @@ classdef RnnFeatureProvider < FeatureExtractor
     properties
         occlusionData
         originalExtractor
-        features
+        wholeFeatures
+        occludedFeatures
     end
     
     methods
@@ -14,7 +15,9 @@ classdef RnnFeatureProvider < FeatureExtractor
                 occlusionData, originalExtractor)
             self.occlusionData = occlusionData;
             self.originalExtractor = originalExtractor;
-            self.features = self.loadFeatures(self.originalExtractor);
+            self.wholeFeatures = self.loadWholeFeatures();
+            self.occludedFeatures = ...
+                self.loadOccludedFeatures(self.originalExtractor);
         end
         
         function name = getName(self)
@@ -24,16 +27,16 @@ classdef RnnFeatureProvider < FeatureExtractor
         function features = extractFeatures(self, ids, runType, ~)
             switch(runType)
                 case RunType.Train
-                    features = self.features(...
+                    features = self.wholeFeatures(...
                         self.occlusionData.pres(ids), :);
                 case RunType.Test
-                    features = self.features(325 + ids, :);
+                    features = self.occludedFeatures(ids, :);
             end
         end
     end
     
     methods (Access = private)
-        function features = loadFeatures(self, originalExtractor)
+        function features = loadOccludedFeatures(self, originalExtractor)
             [featuresFile, filetype] = self.findFeaturesFile(...
                 originalExtractor.getName());
             if strcmp(filetype, 'mat')
@@ -44,6 +47,20 @@ classdef RnnFeatureProvider < FeatureExtractor
             else
                 error('Unknown filetype %s', filetype);
             end
+            
+            if size(features, 1) == 13000
+                return;
+            elseif size(features, 1) == 13325
+                features = features(326:end, :);
+            else
+                error('unknown feature size %d', size(features, 1));
+            end
+        end
+        
+        function features = loadWholeFeatures(~)
+            dir = getFeaturesDirectory();
+            fc7File = [dir, 'klab325_orig/caffenet_fc7_ims_1-325.txt'];
+            features = dlmread(fc7File, ' ', 0, 1);
         end
         
         function [featuresFile, filetype] = ...
