@@ -35,11 +35,7 @@ end
 function timestep = timestepFromName(classifierName)
 token = regexp(classifierName, '_t\-?([0-9]+)', 'tokens');
 if isempty(token)
-    if strcmp(classifierName, 'caffenet_fc7')
-        timestep = -1;
-    else
-        timestep = 0;
-    end
+    timestep = 0;
 else
     timestep = str2double(token{1}{1});
 end

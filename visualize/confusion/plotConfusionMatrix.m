@@ -38,6 +38,10 @@ set(gca, 'XTick', 1:numel(classes));
 set(gca, 'YTick', 1:numel(classes));
 set(gca, 'XTickLabel', classes);
 set(gca, 'YTickLabel', classes);
+if length(classes{1}) > 2
+ax = gca;
+ax.XTickLabelRotation = 45;
+end
 % text
 [xs, ys] = meshgrid(1:size(C, 1), 1:size(C, 2));
 textString = arrayfun(@(i) sprintf('%.0f%%', i), 100 * C, ...
@@ -48,7 +52,7 @@ textColors((C  / max(C(:))) <= 0.5) = {'k'};
 if numel(classes) <= 2
     xs = xs - 0.15;
 else
-    xs = xs - 0.2;
+    xs = xs - 0.3;
 end
 for i = 1:numel(xs)
 text(xs(i), ys(i), textString(i), 'Color', textColors{i});

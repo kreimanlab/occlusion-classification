@@ -1,4 +1,4 @@
-function plotHumanPerformance(percentsBlack, dataset)
+function plot = plotHumanPerformance(percentsBlack, dataset)
 if ~exist('percentsBlack', 'var') || isempty(percentsBlack)
     percentsBlack = [65:5:95, 99];
 end
@@ -11,7 +11,7 @@ percentsBlack = sort(percentsBlack);
 dataset = filterHumanData(dataset);
 [meanValues, standardErrorOfTheMean, percentBlackCenters] = ...
     statsAcrossAll(dataset, percentsBlack);
-errorbar(permute(100 - percentBlackCenters, [2 1]), ...
+plot = errorbar(permute(100 - percentBlackCenters, [2 1]), ...
     meanValues, standardErrorOfTheMean, 'blacko-');
 text(100 - percentsBlack(1) + 1, meanValues(1), 'human');
 end
@@ -21,7 +21,7 @@ function [meanValues, standardErrorOfTheMean, ...
     statsAcrossAll(dataset, percentsBlack)
 % averages across all subjects at once
 meanValues = NaN(length(percentsBlack) - 1, 1);
-standardErrorOfTheMean = NaN(length(percentsBlack)-1, 1);
+standardErrorOfTheMean = NaN(length(percentsBlack) - 1, 1);
 percentBlackCenters = NaN(size(percentsBlack));
 percentBlackRanges = NaN([numel(percentsBlack), 2]);
 for iBlack = 1:length(percentsBlack)

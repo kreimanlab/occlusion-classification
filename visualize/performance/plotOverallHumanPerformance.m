@@ -11,5 +11,5 @@ humanResults = humanResults(ismember(humanResults.truth, categories), :);
 performance = mean(humanResults.correct) * 100;
 xlim = get(gca,'xlim');
 line(xlim, [performance performance], 'Color', lineColor);
-% text(xlim(1) + (xlim(2) - xlim(1)) / 10, performance + 5, 'human');
+text(xlim(2) * 0.9, performance - 3, 'human');
 end

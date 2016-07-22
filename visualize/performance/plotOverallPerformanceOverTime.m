@@ -16,20 +16,11 @@ for modelIter = 1:size(modelTimestepNames, 1)
     end
 end
 %% plot
-% means
 meanValues = mean(performances, 3, 'omitnan');
 standardErrorOfTheMean = std(performances, 0, 3, 'omitnan') / sqrt(kfolds);
-[plots, scaledX] = plotWithScaledX(timesteps, meanValues);
+plots = plotWithScaledX(timesteps, meanValues, ...
+    standardErrorOfTheMean, @errorbar);
 hold on;
-% errors
-for modelIter = 1:size(scaledX, 1)
-    nonNan = ~isnan(meanValues(modelIter, :));
-    errorbar(scaledX{modelIter}, meanValues(modelIter, nonNan), ...
-        standardErrorOfTheMean(modelIter, nonNan), ...
-        'Color', get(plots{modelIter}, 'Color'), ...
-        'Marker', get(plots{modelIter}, 'Marker'), ...
-        'LineStyle', get(plots{modelIter}, 'LineStyle'));
-end
 % text
 for modelIter = 1:numel(modelNames)
     text(length(timesteps(modelIter, :)) - 1, ...

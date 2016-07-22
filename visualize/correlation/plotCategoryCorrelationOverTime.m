@@ -2,9 +2,7 @@ function plotCategoryCorrelationOverTime(corrData)
 %PLOTCATEGORYPERFORMANCEOVERTIM plot the correlation of every single
 %category over time
 
-% [categories, colors] = getCategoryLabels();
-[categories, colors] = getCategoryLabels(5);
-[~, lineStyles, markers] = getModelLabels();
+categories = getCategoryLabels();
 data = load('data/data_occlusion_klab325v2.mat');
 data = data.data;
 data = data(data.pres <= 300, :);
@@ -27,8 +25,8 @@ for category = 1:numel(categories)
             corrData.humanCorrectHalfs(categoriesPres(category, :), half);
     end
     humanHumanCorrs(category) = corr(...
-        squeeze(humanCorrectHalfs(category, :, 1)), ...
-        squeeze(humanCorrectHalfs(category, :, 2)));
+        squeeze(humanCorrectHalfs(category, :, 1))', ...
+        squeeze(humanCorrectHalfs(category, :, 2))');
 end
 
 % models
@@ -38,29 +36,34 @@ modelCorrect = NaN(numel(categories), numel(corrData.modelNames), ...
 modelHumanCorr = NaN(numel(categories), numel(corrData.modelNames), ...
     numTimes);
 for category = 1:numel(categories)
-    categoryXLeft = (category - 1) * numTimes + 1;
-    categoryXRight = categoryXLeft + numTimes - 1;
     for model = 1:numel(corrData.modelNames)
         for timeIter = 1:numTimes
             modelCorrect(category, model, timeIter, :) = corrData.modelCorrect(...
                 categoriesPres(category, :), model, timeIter);
             modelHumanCorr(category, model, timeIter) = corr(...
                 squeeze(modelCorrect(category, model, timeIter, :)), ...
-                squeeze(humanCorrect(category, :)));
-            fprintf('category = %s, model = %s, t = %d => val = %.2f\n', ...
-                categories{category}, corrData.modelNames{model}, ...
-                corrData.timesteps(model, timeIter), modelHumanCorr(category, model, timeIter));
+                squeeze(humanCorrect(category, :))');
         end
-        plot(categoryXLeft:categoryXRight, ...
-            squeeze(modelHumanCorr(category, model, :)), ...
-            [colors{category}, lineStyles{model}, markers{model}]);
-        hold on;
     end
-    plot([categoryXLeft, categoryXRight], ...
-        [humanHumanCorrs(category), humanHumanCorrs(category)], ...
-        colors{category});
 end
-plot(get(gca, 'xlim'), ...
-    [corrData.humanHumanCorrelation corrData.humanHumanCorrelation], '-k');
-categoriesModelsLegend();
+% accumulate
+meanModelHumanCorrelation = squeeze(mean(modelHumanCorr, 1))';
+meanHumanHumanCorrelation = mean(humanHumanCorrs);
+% plot
+bar(meanModelHumanCorrelation, 'EdgeColor', 'none');
+hold on;
+line(get(gca, 'xlim'), [meanHumanHumanCorrelation, meanHumanHumanCorrelation], ...
+    'Color', 'k', 'LineStyle', '--');
+legend(corrData.modelNames);
+xlabels = makeXLabels(corrData.timesteps);
+my_xticklabels(1:length(xlabels), xlabels);
+xlabel('Time step');
+ylabel('Mean per-Category Corr. with Human');
+ylim([0 0.5]);
+set(gca,'TickDir', 'in');
+set(gca,'TickLength', [0.02 0.02]);
+set(gca,'XTick', 1:length(corrData.modelTimestepNames));
+set(gcf, 'Color', 'w');
+box off;
+hold off;
 end
