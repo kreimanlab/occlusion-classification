@@ -1,20 +1,20 @@
-function results = evaluate(task, dataset, classifiers, getLabels, ...
-    trainPres, testPres)
+function results = evaluate(task, dataset, dataSelection, classifiers, ...
+    getLabels, trainPres, testPres)
 if strcmp(task, 'identification')
     testPres = trainPres;
 end
-trainRows = getRows(dataset, trainPres, true);
+trainRows = getRows(dataset, dataSelection, trainPres, true);
 trainLabels = getLabels(dataset, trainRows);
-testRows = getRows(dataset, testPres, false);
+testRows = getRows(dataset, dataSelection, testPres, false);
 testPresAll = dataset.pres(testRows);
 testBlack = dataset.black(testRows);
 testLabels = getLabels(dataset, testRows);
 results = cell(numel(classifiers), 1);
 parfor iClassifier = 1:numel(classifiers)
     classifier = classifiers{iClassifier};
-    fprintf('Training %s on whole images...\n', classifier.getName());
+    fprintf('Training %s...\n', classifier.getName());
     classifier.train(trainRows, trainLabels);
-    fprintf('Testing %s on occluded images\n', classifier.getName());
+    fprintf('Testing %s...\n', classifier.getName());
     predictedLabels = classifier.predict(testRows);
     % analyze
     correct = analyzeResults(predictedLabels, testLabels);
@@ -30,11 +30,13 @@ end
 results = {vertcat(results{:})};
 end
 
-function rows = getRows(dataset, pres, uniqueRows)
+function rows = getRows(dataset, dataSelection, pres, uniqueRows)
 if uniqueRows
-    [~, rows] = unique(dataset, 'pres');
+    selectedData = dataset(dataSelection, :);
+    [~, rows] = unique(selectedData, 'pres');
+    rows = dataSelection(rows);
 else
-    rows = 1:size(dataset, 1);
+    rows = dataSelection;
 end
 rows = rows(ismember(dataset.pres(rows), pres));
 assert(all(sort(unique(dataset.pres(rows))) == sort(pres)));

@@ -48,10 +48,11 @@ def run(model, X, timesteps=6):
 
 
 def load_occluded_features(features_directory, feature_size):
-    features = np.zeros((13000, feature_size))
-    for i in range(1, features.shape[0], 1000):
+    num_features = 13325
+    features = np.zeros((num_features, feature_size))
+    for i in range(1, num_features, 1000):
         filename = os.path.join(features_directory, "data_occlusion_klab325v2",
-                                "caffenet_fc7_ims_%d-%d.txt" % (i, i + 999))
+                                "caffenet_fc7_ims_%d-%d.txt" % (i, min(i + 999, num_features)))
         _features = np.loadtxt(filename, usecols=range(1, feature_size + 1))
         features[i - 1:i - 1 + 1000, :] = _features
     return features

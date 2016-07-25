@@ -6,8 +6,8 @@ classdef RnnFeatureProvider < FeatureExtractor
     properties
         occlusionData
         originalExtractor
-        wholeFeatures
-        occludedFeatures
+        trainFeatures % unmodified whole
+        testFeatures % RNN'ed occluded+whole
     end
     
     methods
@@ -15,28 +15,28 @@ classdef RnnFeatureProvider < FeatureExtractor
                 occlusionData, originalExtractor)
             self.occlusionData = occlusionData;
             self.originalExtractor = originalExtractor;
-            self.wholeFeatures = self.loadWholeFeatures();
-            self.occludedFeatures = ...
-                self.loadOccludedFeatures(self.originalExtractor);
+            self.trainFeatures = self.loadTrainFeatures();
+            self.testFeatures = ...
+                self.loadTestFeatures(self.originalExtractor);
         end
         
         function name = getName(self)
             name = self.originalExtractor.getName();
         end
         
-        function features = extractFeatures(self, ids, runType, ~)
+        function features = extractFeatures(self, rows, runType, ~)
             switch(runType)
                 case RunType.Train
-                    features = self.wholeFeatures(...
-                        self.occlusionData.pres(ids), :);
+                    features = self.trainFeatures(...
+                        self.occlusionData.pres(rows), :);
                 case RunType.Test
-                    features = self.occludedFeatures(ids, :);
+                    features = self.testFeatures(rows, :);
             end
         end
     end
     
     methods (Access = private)
-        function features = loadOccludedFeatures(self, originalExtractor)
+        function features = loadTestFeatures(self, originalExtractor)
             [featuresFile, filetype] = self.findFeaturesFile(...
                 originalExtractor.getName());
             if strcmp(filetype, 'mat')
@@ -48,16 +48,15 @@ classdef RnnFeatureProvider < FeatureExtractor
                 error('Unknown filetype %s', filetype);
             end
             
-            if size(features, 1) == 13000
-                return;
-            elseif size(features, 1) == 13325
-                features = features(326:end, :);
+            if size(features, 1) == 13325
+                features = [features(326:end, :); features(1:325, :)];
             else
-                error('unknown feature size %d', size(features, 1));
+                warning('feature size %d does not match data size %d', ...
+                    size(features, 1), size(self.occlusionData, 1));
             end
         end
         
-        function features = loadWholeFeatures(~)
+        function features = loadTrainFeatures(~)
             dir = getFeaturesDirectory();
             fc7File = [dir, 'klab325_orig/caffenet_fc7_ims_1-325.txt'];
             features = dlmread(fc7File, ' ', 0, 1);
