@@ -2,9 +2,9 @@ import os
 import random
 
 import numpy as np
-from sklearn.cross_validation import KFold
 from keras.layers import SimpleRNN
 from keras.models import Sequential
+from sklearn.cross_validation import KFold
 
 
 def create_model(feature_size):
@@ -77,12 +77,47 @@ def align_features(whole_features, occluded_features):
 
 def get_features_directory(use_central=True):
     central_dir = "/groups/kreiman/martin/features"
-    if use_central and os.path.exists(central_dir):
+    if use_central and os.path.isdir(central_dir):
         return central_dir
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../data/features")
+    features_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../data/features")
+    if not os.path.isdir(features_dir):
+        os.mkdir(features_dir)
+    return features_dir
 
 
-def cross_validate_prediction(model, X, Y, kfolds, train_epochs, max_timestep):
+def get_weights_file(kfold):
+    weights_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data', 'weights')
+    if not os.path.isdir(weights_dir):
+        os.mkdir(weights_dir)
+    weights_filename = 'model_weights-kfold%d.hdf5' % kfold
+    weights_file = os.path.join(weights_dir, weights_filename)
+    return weights_file
+
+
+def indices_across_objects(occluded_features, num_kfolds):
+    return KFold(occluded_features.shape[0], num_kfolds)
+
+
+def indices_across_categories(occluded_features, num_kfolds):
+    categories = np.loadtxt(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                         "../../data/data_occlusion_klab325v2-categories.txt"))
+    assert len(categories) == len(occluded_features)
+    unique_categories = list(set(categories))
+    assert num_kfolds == len(unique_categories)
+    kfold = KFold(len(unique_categories), num_kfolds)
+    for train_category_indices, predict_category_indices in kfold:
+        train_categories = [unique_categories[i] for i in train_category_indices]
+        predict_categories = [unique_categories[i] for i in predict_category_indices]
+        train_indices = [i for i in range(len(categories))
+                         if categories[i] in train_categories and i < len(occluded_features)]
+        predict_indices = [i for i in range(len(categories))
+                           if categories[i] in predict_categories and i < len(occluded_features)]
+        assert all([categories[i] in train_categories for i in train_indices])
+        assert all([categories[i] in predict_categories for i in predict_indices])
+        yield (train_indices, predict_indices)
+
+
+def cross_validate_prediction(model, X, Y, rows, train_epochs, max_timestep):
     """
     for each kfold, train on subset of features and predict the rest.
     Ultimately predict all features by concatenating them for each kfold.
@@ -90,15 +125,20 @@ def cross_validate_prediction(model, X, Y, kfolds, train_epochs, max_timestep):
     initial_model_weights = model.get_weights()
     predicted_features = np.zeros((max_timestep + 1,) + X.shape)
     num_kfold = 0
-    for train_indices, predict_indices in kfolds:
+    for train_indices, predict_indices in rows:
         model.reset_states()
         model.set_weights(initial_model_weights)
 
         X_train, Y_train = X[train_indices], Y[train_indices]
         X_predict, Y_predict = X[predict_indices], Y[predict_indices]
-        print('[kfold %d] training...' % num_kfold)
-        train(model, X_train, Y_train, num_epochs=train_epochs)
-        model.save_weights('model_weights-kfold%d.hdf5' % num_kfold, overwrite=True)
+        weights_file = get_weights_file(num_kfold)
+        if os.path.isfile(weights_file):
+            print('[kfold %d] using pre-trained weights %s' % (num_kfold, weights_file))
+            model.load_weights(weights_file)
+        else:
+            print('[kfold %d] training...' % num_kfold)
+            train(model, X_train, Y_train, num_epochs=train_epochs)
+            model.save_weights(weights_file, overwrite=True)
         print('[kfold %d] predicting...' % num_kfold)
         predicted_Y = run(model, X_predict, timesteps=max_timestep)
         for timestep, prediction in predicted_Y.items():
@@ -122,9 +162,10 @@ def run_rnn():
     occluded_features = load_occluded_features(features_directory, feature_size)
     aligned_whole_features = align_features(whole_features, occluded_features)
     # run
-    kfolds = KFold(occluded_features.shape[0], num_kfolds)
+    # row_provider = indices_across_objects(occluded_features, num_kfolds)
+    row_provider = indices_across_categories(occluded_features, num_kfolds)
     predicted_features = cross_validate_prediction(model, occluded_features, aligned_whole_features,
-                                                   kfolds, train_epochs=num_epochs, max_timestep=max_timestep)
+                                                   row_provider, train_epochs=num_epochs, max_timestep=max_timestep)
     # save
     print('saving...')
     for timestep in range(0, max_timestep + 1):
