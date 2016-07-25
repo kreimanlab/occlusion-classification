@@ -9,8 +9,8 @@ end
 
 assert(size(xticks, 1) == size(timesteps, 1));
 % remove duplicates
-for row = 1:size(timesteps, 1)
-    for otherRow = 1:row - 1
+for row = size(timesteps, 1):-1:1
+    for otherRow = row + 1:size(timesteps, 1)
         if isequaln(timesteps(otherRow, :), timesteps(row, :)) ...
                 && all(xticks{otherRow, :} == xticks{row, :})
             timesteps(row, :) = [];

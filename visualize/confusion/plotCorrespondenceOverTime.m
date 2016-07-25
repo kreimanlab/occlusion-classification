@@ -24,7 +24,14 @@ humanResults = load('data/data_occlusion_klab325v2.mat');
 %% model-human
 [modelNames, modelTimestepNames, timesteps] = ...
     collectModelProperties(modelResults);
-modelHumanCorrs = NaN(size(timesteps));
+numModels = numel(modelNames);
+% extend for random data
+for i = 1:numModels
+    modelNames{numModels + i} = [modelNames{i}, '-random'];
+end
+timesteps = repmat(timesteps, [2, 1]);
+% compute
+modelHumanCorrs = NaN(numModels * 2, size(modelTimestepNames, 2));
 modelHumanErrs = NaN(size(modelHumanCorrs));
 for modelIter = 1:size(modelTimestepNames, 1)
     for timeIter = 1:size(modelTimestepNames, 2)
@@ -44,27 +51,33 @@ for modelIter = 1:size(modelTimestepNames, 1)
             modelHumanErrs(modelIter, timeIter)] = compare(...
             humanResults.(humanField), currentResults.(modelField), ...
             rowPartitions1, rowPartitions2);
+        % random
+        if strcmp(modelField, 'response')
+            randomData = drawRandomly(currentResults.(modelField), ...
+                currentResults.truth); % additional performance constraint
+        else
+            randomData = drawRandomly(currentResults.(modelField));
+        end
+        [modelHumanCorrs(numModels + modelIter, timeIter), ...
+            modelHumanErrs(numModels + modelIter, timeIter)] = compare(...
+            humanResults.(humanField), randomData, ...
+            rowPartitions1, rowPartitions2);
     end
 end
 
-%% random
-if strcmp(humanField, 'response_category')
-    % additional performance constraint
-    randomData = drawRandomly(humanResults.(humanField), humanResults.truth);
-else
-    randomData = drawRandomly(humanResults.(humanField));
-end
-[randomHumanCorr, randomHumanErr] = compare(...
-    humanResults.(humanField), randomData, ...
-    rowPartitions1, rowPartitions2);
-
 %% plot
 % model-human
-plotArgs = cell(numel(modelColors), 2);
+modelColors = modelColors(1:numModels);
+plotArgs = cell(numModels * 2, 2);
 for i = 1:numel(modelColors)
-    plotArgs{i, 1} = {'Color', modelColors{i}};
+    plotArgs{i, 1} = ...
+        {'Color', modelColors{i}, 'LineStyle', '-'};
     plotArgs{i, 2} = true;
+    plotArgs{numModels + i, 1} = ...
+        {'Color', modelColors{i}, 'LineStyle', ':'};
+    plotArgs{numModels + i, 2} = true;
 end
+plotArgs = repmat(plotArgs, [2, 1]);
 plots = plotWithScaledX(timesteps, modelHumanCorrs, modelHumanErrs, ...
     @shadedErrorBar, plotArgs);
 hold on;
@@ -74,14 +87,10 @@ shadedErrorBar(xlim(), [humanHumanCorr humanHumanCorr], ...
     {'Color', [.7 .7 .7]}, true);
 text(1.75 * mean(get(gca, 'xlim')), humanHumanCorr - 0.01, 'human', ...
     'Color', [.7 .7 .7]);
-% random-human
-shadedErrorBar(xlim(), [randomHumanCorr randomHumanCorr], ...
-    [randomHumanErr, randomHumanErr], ...
-    {'Color', [.8 .8 .8]}, true);
-text(1.75 * mean(get(gca, 'xlim')), randomHumanCorr - 0.01, 'random', ...
-    'Color', [.8 .8 .8]);
+% label
 for i = 1:size(modelNames, 1)
-    text(mean(get(gca, 'xlim')), mean(modelHumanCorrs(i, :), 'omitnan'), ...
+    text(0.7 * mean(get(gca, 'xlim')) + i, ...
+        mean(modelHumanCorrs(i, :), 'omitnan'), ...
         modelNames{i}, 'Color', get(plots{i}.mainLine, 'Color'));
 end
 xlabel('Time step');
@@ -125,9 +134,18 @@ end
 
 function randAnswers = drawRandomly(answers, truthConstraint)
 if ~exist('truthConstraint', 'var')
+    % shuffle
     indices = randperm(numel(answers));
     randAnswers = answers(indices);
 else
+    % informal description of algorithm:
+    % random data = human data
+    % for i = 1:numel(human data)
+    %     i1 = choose one element in random data 
+    %           where answer != truth
+    %     i2 = choose one element in random data 
+    %           where answer == truth and answer == truth(i1)
+    %     swap(i1, i2)
     r = numel(answers);
     randAnswers = answers;
     for i = 1:r
