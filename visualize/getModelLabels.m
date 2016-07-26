@@ -4,9 +4,9 @@ if ~exist('labels', 'var')
 end
 
 names = cell(length(labels), 1);
-names(labels == 1) = {'RNN'};
-names(labels == 2) = {'Hopfield'};
-names(labels == 3) = {'RNN-train1cat'};
+names(labels == 1) = {'RNN5'};
+names(labels == 2) = {'RNNH'};
+names(labels == 3) = {'RNN1'};
 
 lineStyles = cell(length(labels), 1);
 lineStyles{labels == 1} = '--';

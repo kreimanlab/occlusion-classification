@@ -12,7 +12,7 @@ classdef CorrelationData
         timesteps
         modelCorrect
         
-        humanHumanCorrelation
+        humanHumanCorrelations
         modelHumanCorrelations
     end
     
@@ -21,7 +21,7 @@ classdef CorrelationData
                 humanResults, humanCorrect, humanCorrectHalfs, ...
                 modelNames, modelTimestepNames, timesteps, ...
                 modelCorrect, ...
-                humanHumanCorrelation, modelHumanCorrelations)
+                humanHumanCorrelations, modelHumanCorrelations)
             obj.presIds = presIds;
             
             obj.humanResults = humanResults;
@@ -33,7 +33,7 @@ classdef CorrelationData
             obj.timesteps = timesteps;
             obj.modelCorrect = modelCorrect;
             
-            obj.humanHumanCorrelation = humanHumanCorrelation;
+            obj.humanHumanCorrelations = humanHumanCorrelations;
             obj.modelHumanCorrelations = modelHumanCorrelations;
         end
         
