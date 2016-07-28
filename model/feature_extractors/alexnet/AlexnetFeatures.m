@@ -8,12 +8,15 @@ classdef AlexnetFeatures < FeatureExtractor
     end
     
     methods
-        function obj = AlexnetFeatures(featuresLength)
+        function obj = AlexnetFeatures(featuresLength, netParams)
             obj.featuresLength = featuresLength;
-            
             dir = fileparts(mfilename('fullpath'));
-            obj.netParams = load([dir '/ressources/alexnetParams.mat']);
-            % obtained from https://drive.google.com/file/d/0B-VdpVMYRh-pQWV1RWt5NHNQNnc/view
+            if ~exist('netParams', 'var') || isempty(netParams)
+                netParams = load([dir, '/ressources/alexnetParams.mat']);
+                % obtained from https://drive.google.com/file/d/0B-VdpVMYRh-pQWV1RWt5NHNQNnc/view
+            end
+            
+            obj.netParams = netParams;
             imagesMeanData = load([dir '/ressources/ilsvrc_2012_mean.mat']);
             obj.imagesMean = imagesMeanData.mean_data;
         end
