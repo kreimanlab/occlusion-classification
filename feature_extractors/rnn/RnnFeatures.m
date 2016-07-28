@@ -5,18 +5,23 @@ classdef RnnFeatures < FeatureExtractor
     properties
         timesteps
         featuresInput
+        name
         weights
         activation = @(x) max(0, x)
     end
-        
+    
     methods
-        function obj = RnnFeatures(timesteps, featuresInput)
+        function obj = RnnFeatures(timesteps, featuresInput, name)
             obj.timesteps = timesteps;
             obj.featuresInput = featuresInput;
+            if ~exist('name', 'var')
+                name = 'RNN_features_fc7_noRelu_t';
+            end
+            obj.name = name;
         end
         
         function name = getName(self)
-            name = ['RNN_features_fc7_noRelu_t' num2str(self.timesteps)];
+            name = [self.name, num2str(self.timesteps)];
         end
         
         function previousFeatures = extractFeatures(self, rows, runType, labels)

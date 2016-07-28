@@ -1,8 +1,10 @@
+function alexNetForward()
 % Forward path implementation of AlexNet
 
 %% Preparation
 % Load network parameters.
-netParams=load('./ressources/alexnetParams.mat'); % obtained from https://drive.google.com/file/d/0B-VdpVMYRh-pQWV1RWt5NHNQNnc/view
+dir = fileparts(mfilename('fullpath'));
+netParams = load([dir '/ressources/randomParams.mat']); % obtained from https://drive.google.com/file/d/0B-VdpVMYRh-pQWV1RWt5NHNQNnc/view
 conv1Kernels=netParams.weights(1).weights{1};
 conv1Bias=netParams.weights(1).weights{2};
 conv2Kernels=netParams.weights(2).weights{1};
@@ -55,4 +57,19 @@ prob=softmax(fc8);
 toc;
 
 %% Print
-displayPrediction(prob);
+displayTopNPrediction(prob, 10);
+end
+
+function displayTopNPrediction( prob, n )
+    sortedProb = sort(prob, 'descend');
+	topnPrediction=find(ismember(prob, sortedProb(1:n)));
+    fid=fopen('ressources/synset_words.txt');
+    C = textscan(fid, '%s','delimiter', '\n');
+    textLines={C{1}{topnPrediction}};
+    for i = 1:length(textLines)
+        textLine = textLines{i};
+        whiteSpace=find(textLine==' ');
+        textPrediction=textLine(whiteSpace(1)+1:end);
+        fprintf('Top%d: %s\n', i, textPrediction);
+    end
+end
