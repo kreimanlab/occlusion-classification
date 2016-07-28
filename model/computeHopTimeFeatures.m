@@ -1,21 +1,25 @@
-function computeHopTimeFeatures(savesteps)
-addpath(genpath(pwd));
-if ~exist('savesteps', 'var')
-    savesteps = [1:100, 110:10:300];
-end
+function computeHopTimeFeatures(dataset, varargin)
 
 %% Setup
-featuresDir = 'data/features';
-wholeDir = [featuresDir '/klab325_orig'];
-occlusionDir = [featuresDir '/data_occlusion_klab325v2'];
-% data
-dataset = load('data/data_occlusion_klab325v2.mat');
-dataset = dataset.data;
+argParser = inputParser();
+argParser.KeepUnmatched = true;
+argParser.addParameter('savesteps', [1:100, 110:10:300], @isnumeric);
+argParser.addParameter('trainDirectory', [], @(p) exist(p, 'dir'));
+argParser.addParameter('testDirectory', [], @(p) exist(p, 'dir'));
+
+argParser.parse(varargin{:});
+fprintf('Computing features in %s with args:\n', pwd);
+disp(argParser.Results);
+savesteps = argParser.Results.savesteps;
+trainDir = argParser.Results.trainDirectory;
+testDir = argParser.Results.testDirectory;
+
 % classifiers
-featureProvider = curry(@FeatureProvider, dataset, 1:length(dataset));
+featureProviderFactory = FeatureProviderFactory(trainDir, testDir, ...
+    dataset.pres, 1:length(dataset));
 featureExtractor = HopFeatures(max(savesteps), ...
     BipolarFeatures(0, ...
-    featureProvider(AlexnetFc7Features())));
+    featureProviderFactory.get(AlexnetFc7Features())));
 
 %% Run
 % whole = fc7. just train hop network on whole.
@@ -24,7 +28,7 @@ fprintf('Training on %d whole objects\n', numel(wholePresRows));
 features = featureExtractor.extractFeatures(wholePresRows, ...
     RunType.Train, dataset.truth(wholePresRows));
 for t = savesteps
-    saveFeatures(features, wholeDir, ...
+    saveFeatures(features, trainDir, ...
         featureExtractor, t, 1, 325);
 end
 % occluded
@@ -38,7 +42,7 @@ for dataIter = 1:1000:length(dataset)
     for t = savesteps
         features = ys(:, :, t);
         assert(size(features, 1) == dataEnd - dataIter + 1);
-        saveFeatures(features, occlusionDir, ...
+        saveFeatures(features, testDir, ...
             featureExtractor, t, dataIter, dataEnd);
     end
 end

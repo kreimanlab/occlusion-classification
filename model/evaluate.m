@@ -1,12 +1,11 @@
-function results = evaluate(task, dataset, dataSelection, classifiers, ...
-    getLabels, trainPres, testPres)
-if strcmp(task, 'identification')
-    testPres = trainPres;
-end
+function results = evaluate(dataset, dataSelection, classifiers, ...
+    trainPres, testPres)
 trainRows = getRows(dataset, dataSelection, trainPres, true);
+assert(all(sort(unique(dataset.pres(trainRows))) == sort(trainPres)));
 trainLabels = getLabels(dataset, trainRows);
 testRows = getRows(dataset, dataSelection, testPres, false);
 testPresAll = dataset.pres(testRows);
+assert(all(sort(unique(testPresAll)) == sort(testPres)));
 testBlack = dataset.black(testRows);
 testLabels = getLabels(dataset, testRows);
 results = cell(numel(classifiers), 1);
@@ -43,4 +42,8 @@ assert(all(sort(unique(dataset.pres(rows))) == sort(pres)));
 if uniqueRows
     assert(length(rows) == length(pres));
 end
+end
+
+function labels = getLabels(dataset, rows)
+labels = dataset.truth(rows);
 end

@@ -11,13 +11,13 @@ classdef RnnFeatureProvider < FeatureExtractor
     end
     
     methods
-        function self = RnnFeatureProvider(...
+        function self = RnnFeatureProvider(directory, ...
                 occlusionData, originalExtractor)
             self.occlusionData = occlusionData;
             self.originalExtractor = originalExtractor;
-            self.trainFeatures = self.loadTrainFeatures();
+            self.trainFeatures = self.loadTrainFeatures(directory);
             self.testFeatures = ...
-                self.loadTestFeatures(self.originalExtractor);
+                self.loadTestFeatures(directory, self.originalExtractor);
         end
         
         function name = getName(self)
@@ -36,9 +36,10 @@ classdef RnnFeatureProvider < FeatureExtractor
     end
     
     methods (Access = private)
-        function features = loadTestFeatures(self, originalExtractor)
+        function features = loadTestFeatures(self, directory, ...
+                originalExtractor)
             [featuresFile, filetype] = self.findFeaturesFile(...
-                originalExtractor.getName());
+                directory, originalExtractor.getName());
             if strcmp(filetype, 'mat')
                 features = load(featuresFile);
                 features = features.features;
@@ -56,23 +57,21 @@ classdef RnnFeatureProvider < FeatureExtractor
             end
         end
         
-        function features = loadTrainFeatures(~)
-            dir = getFeaturesDirectory();
-            fc7File = [dir, 'klab325_orig/caffenet_fc7_ims_1-325.txt'];
+        function features = loadTrainFeatures(~, directory)
+            fc7File = [directory, 'klab325_orig/caffenet_fc7_ims_1-325.txt'];
             features = dlmread(fc7File, ' ', 0, 1);
         end
         
         function [featuresFile, filetype] = ...
-                findFeaturesFile(~, extractorName)
-            dir = getFeaturesDirectory();
+                findFeaturesFile(~, directory, extractorName)
             possibleExtensions = {'mat', 'txt'};
             for filetype = possibleExtensions
-                featuresFile = [dir, extractorName, '.', filetype{:}];
+                featuresFile = [directory, extractorName, '.', filetype{:}];
                 if exist(featuresFile, 'file') == 2
                     return;
                 end
             end
-            error('file %s not found in directory %s', extractorName, dir);
+            error('file %s not found in directory %s', extractorName, directory);
         end
     end
 end

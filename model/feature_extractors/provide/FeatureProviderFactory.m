@@ -2,14 +2,21 @@ classdef FeatureProviderFactory < handle
     % Caches feature providers to minimize memory overhead.
     
     properties
-        featureProviders
-        occlusionData
+        trainDirectory
+        testDirectory
+        objectForRow
         dataSelection
+        
+        featureProviders
     end
     
     methods
-        function self = FeatureProviderFactory(occlusionData, dataSelection)
-            self.occlusionData = occlusionData;
+        function self = FeatureProviderFactory(...
+                trainDirectory, testDirectory, ...
+                objectForRow, dataSelection)
+            self.trainDirectory = trainDirectory;
+            self.testDirectory = testDirectory;
+            self.objectForRow = objectForRow;
             self.dataSelection = dataSelection;
             self.featureProviders = containers.Map();
         end
@@ -21,18 +28,21 @@ classdef FeatureProviderFactory < handle
                 return;
             end
             if strfind(class(originalExtractor), 'Rnn') == 1
-                featureProvider = RnnFeatureProvider(...
-                    self.occlusionData, originalExtractor);
+                dir = fileparts(self.trainDirectory);
+                assert(strcmp(dir, fileparts(self.testDirectory)));
+                featureProvider = RnnFeatureProvider(dir, ...
+                    self.objectForRow, originalExtractor);
             else
+                constructor = curry(@FeatureProvider, ...
+                        self.trainDirectory, self.testDirectory, ...
+                        self.objectForRow, self.dataSelection);
                 if isa(originalExtractor, 'BipolarFeatures')
-                    inputProvider = FeatureProvider(...
-                        self.occlusionData, self.dataSelection, ...
+                    inputProvider = constructor(...
                         originalExtractor.featuresInput);
                     originalExtractor.featuresInput = inputProvider;
                     featureProvider = originalExtractor;
                 else
-                    featureProvider = FeatureProvider(...
-                        self.occlusionData, self.dataSelection, ...
+                    featureProvider = constructor(...
                         originalExtractor);
                 end
             end
