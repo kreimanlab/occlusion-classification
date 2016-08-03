@@ -6,6 +6,10 @@ classdef MaskedImageProvider < ImageProvider
             obj = obj@ImageProvider(data, consumer);
         end
         
+        function name = getName(self)
+            name = [self.consumer.getName(), '-masked'];
+        end
+        
         function features = extractFeatures(self, dataSelection, ...
                 runType, labels)
             imgs = self.getImages(dataSelection, runType);
