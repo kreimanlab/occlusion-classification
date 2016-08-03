@@ -2,27 +2,35 @@ function computeFeatures(varargin)
 %% Setup
 argParser = inputParser();
 argParser.KeepUnmatched = true;
-argParser.addParameter('objectsForRows', [], @isnumeric);
+argParser.addParameter('data', [], @(d) isa(d, 'dataset'));
 argParser.addParameter('dataSelection', [], @isnumeric);
 argParser.addParameter('trainDirectory', [], @(p) exist(p, 'dir'));
 argParser.addParameter('testDirectory', [], @(p) exist(p, 'dir'));
 argParser.addParameter('featureExtractors', {}, ...
     @(fs) iscell(fs) && all(cellfun(@(f) isa(f, 'FeatureExtractor'), fs)));
+argParser.addParameter('masked', false, @(b) b == true || b == false);
 
 argParser.parse(varargin{:});
 fprintf('Computing features in %s with args:\n', pwd);
 disp(argParser.Results);
 dataSelection = argParser.Results.dataSelection;
-objectsForRows = argParser.Results.objectsForRows;
+data = argParser.Results.data;
 trainDir = argParser.Results.trainDirectory;
 testDir = argParser.Results.testDirectory;
 featureExtractors = argParser.Results.featureExtractors;
 assert(~isempty(featureExtractors), 'featureExtractors must not be empty');
+maskImages = argParser.Results.masked;
 
 %% Run
-[~, uniquePresRows] = unique(objectsForRows);
+parallelPoolObject = parpool; % init parallel computing pool
+[~, uniquePresRows] = unique(data.pres);
 for featureExtractorIter = 1:length(featureExtractors)
     featureExtractor = featureExtractors{featureExtractorIter};
+    if ~maskImages
+        featureExtractor = ImageProvider(data, featureExtractor);
+    else
+        featureExtractor = MaskedImageProvider(data, featureExtractor);
+    end
     % whole
     fprintf('%s train images\n', featureExtractor.getName());
     features = featureExtractor.extractFeatures(uniquePresRows, ...
@@ -31,19 +39,21 @@ for featureExtractorIter = 1:length(featureExtractors)
         1, size(features, 1));
     
     % occluded
-    for dataIter = 1:1000:numel(objectsForRows)
-        dataEnd = dataIter + 999;
-        if ~any(ismember(dataSelection, dataIter.dataEnd))
+    parfor dataIter = 1:size(data, 1) / 1000 - 1
+        dataStart = dataIter * 1000 + 1;
+        dataEnd = dataStart + 999;
+        if ~any(ismember(dataSelection, dataStart:dataEnd))
             continue;
         end
         fprintf('%s test images %d/%d\n', featureExtractor.getName(), ...
-            dataIter, numel(objectsForRows));
-        features = featureExtractor.extractFeatures(dataIter:dataEnd, ...
+            dataStart, size(data, 1));
+        features = featureExtractor.extractFeatures(dataStart:dataEnd, ...
             RunType.Test, []);
         saveFeatures(features, testDir, ...
-            featureExtractor, dataIter, dataEnd);
+            featureExtractor, dataStart, dataEnd);
     end
 end
+delete(parallelPoolObject); % teardown pool
 end
 
 function saveFeatures(features, dir, classifier, dataMin, dataMax)

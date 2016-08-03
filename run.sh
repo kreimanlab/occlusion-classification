@@ -7,7 +7,7 @@ fnc_suffix=";exit"
 case "$1" in
 "classification" | "features" | "features-hop")
   queue=long
-  if [[ "$1" == "classification" ]]; then
+  if [[ "$1" == "classification" || "$1" == "features" ]]; then
     queue="parallel -n 8"
   fi
   if [ -z "$2" ]; then
@@ -21,6 +21,7 @@ case "$1" in
   fnc="computeHopDiffs($2)"
   ;;
 "rnn")
+  rm -rf ~/.theano/compiledir*
   queue="gpu -R rusage[ngpus=1]"
   program=python
   fnc=model/feature_extractors/rnn/RnnFeatures.py
