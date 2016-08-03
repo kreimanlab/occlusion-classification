@@ -9,6 +9,9 @@ end
 
 %% Prepare
 percentsBlack = [65:5:95, 99];
+if any(results{1}.black == 0)
+    percentsBlack = [0, percentsBlack];
+end
 percentsVisible = NaN(size(percentsBlack));
 kfolds = length(results);
 classifierNames = unique(results{1}.name);
@@ -32,12 +35,9 @@ standardErrorOfTheMean = std(accuracies, 0, dimKfolds, 'omitnan') / ...
 xlim([min(percentsVisible) - 3, max(percentsVisible) + 8]);
 x = permute(repmat(percentsVisible, length(classifierNames), 1), [2 1]);
 p = errorbar(x, meanValues, standardErrorOfTheMean, 'o-');
+modelColors = adjustModelColors(p, classifierNames);
 hold on;
 % text labels
-modelColors = get(p, 'Color');
-if ~iscell(modelColors)
-    modelColors = {modelColors};
-end
 for i = 1:size(classifierNames)
     text(percentsVisible(1) + 1, meanValues(1, i), ...
         strrep(classifierNames{i}, '_', '\_'), 'Color', modelColors{i});

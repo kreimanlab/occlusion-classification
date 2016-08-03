@@ -18,8 +18,10 @@ end
 %% plot
 meanValues = mean(performances, 3, 'omitnan');
 standardErrorOfTheMean = std(performances, 0, 3, 'omitnan') / sqrt(kfolds);
+plotArgs = {'o-'};
 plots = plotWithScaledX(timesteps, meanValues, ...
-    standardErrorOfTheMean, @errorbar);
+    standardErrorOfTheMean, @errorbar, plotArgs);
+adjustModelColors([plots{:, 1}], modelNames);
 hold on;
 % text
 for modelIter = 1:numel(modelNames)

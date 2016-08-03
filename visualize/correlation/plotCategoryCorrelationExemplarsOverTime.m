@@ -29,8 +29,8 @@ for categoryIter = 1:numel(categories)
     humanCorrect(categoryIter, :) = ...
         corrData.humanCorrect(categoriesPres(categoryIter, :));
     for half = 1:2
-        humanCorrectHalfs(categoryIter, :, half) = ...
-            corrData.humanCorrectHalfs(categoriesPres(categoryIter, :), half);
+        humanCorrectHalfs(categoryIter, :, half) = corrData...
+            .humanCorrectHalfs(1, categoriesPres(categoryIter, :), half);
     end
     half1 = squeeze(humanCorrectHalfs(categoryIter, :, 1));
     half2 = squeeze(humanCorrectHalfs(categoryIter, :, 2));

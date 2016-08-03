@@ -1,7 +1,7 @@
 function [abbreviatedNames, timestepNames, timesteps] = ...
     collectModelProperties(modelResults)
 modelResults = collapseResults(modelResults);
-modelPrefixes = {'rnn', 'caffe', 'train1cat'};
+modelPrefixes = {'rnn', 'caffe', 'rnn4'};
 typeAbbreviations = getModelLabels();
 uniqueNames = sort(unique(modelResults.name));
 modelOccurrences = cell2mat(...
@@ -33,7 +33,7 @@ end
 end
 
 function timestep = timestepFromName(classifierName)
-token = regexp(classifierName, '_t\-?([0-9]+)', 'tokens');
+token = regexp(classifierName, '[_\-]t(?:imestep)?\-?([0-9]+)', 'tokens');
 if isempty(token)
     timestep = 0;
 else

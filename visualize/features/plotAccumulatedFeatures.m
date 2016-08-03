@@ -1,10 +1,11 @@
-function plotAccumulatedFeatures()
+function plotAccumulatedFeatures(wholeFeatures)
 dataset = load('data/data_occlusion_klab325v2.mat');
 dataset = dataset.data(dataset.data.pres <= 300, :);
 
-wholeFeatures = dlmread(['data/features/klab325_orig/'...
-    'caffenet_fc7_ims_1-325.txt'], ' ', 0, 1);
-wholeFeatures = wholeFeatures(1:300, :);
+if size(wholeFeatures, 1) == 325
+    wholeFeatures = wholeFeatures(1:300, :);
+end
+assert(size(wholeFeatures, 1) == 300);
 wholeFeatures = bipolarize(wholeFeatures, 0)';
 % wholeFeatures = downsampleVar(1000, wholeFeatures')';
 wholeRows = getRows(dataset, (1:size(wholeFeatures, 2))', true);

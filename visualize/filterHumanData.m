@@ -6,8 +6,7 @@ if ~exist('keepSoas', 'var')
 end
 relevantRows = ...
     data.pres <= 300 & ...
-    data.masked == 0 & ...
-    data.occluded == 1;
+    data.masked == 0;
 if ~keepSoas
     relevantRows = relevantRows & data.soa == .150;
 end

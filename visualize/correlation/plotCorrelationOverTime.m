@@ -2,9 +2,10 @@ function plotCorrelationOverTime(corrData)
 %PLOTCORRELATIONOVERTIME plots the overall correlations of model
 %compared to human
 
-barwitherr(squeeze(stderrmean(corrData.modelHumanCorrelations, 1))', ...
+plots = barwitherr(squeeze(stderrmean(corrData.modelHumanCorrelations, 1))', ...
     squeeze(mean(corrData.modelHumanCorrelations, 1))', ...
     'EdgeColor', 'none');
+adjustModelColors(plots, corrData.modelNames, 'FaceColor');
 box off;
 hold on;
 shadedErrorBar(xlim(), ...
@@ -20,7 +21,7 @@ set(gca,'TickDir', 'in');
 set(gca,'TickLength', [0.02 0.02]);
 set(gca,'XTick', 1:length(corrData.modelTimestepNames));
 xlabel('Time step');
-ylabel('Corr. with Human');
+ylabel('Correlation with Human');
 set(gcf, 'Color', 'w');
 box off;
 hold off;

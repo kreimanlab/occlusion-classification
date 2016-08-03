@@ -1,6 +1,6 @@
 function categoriesModelsLegend()
 [categories, colors] = getCategoryLabels();
-[modelNames, modelLines, modelMarkers] = getModelLabels();
+[modelNames, ~, modelLines, modelMarkers] = getModelLabels();
 legendDummies = NaN(numel(categories) + numel(modelNames) + 1, 1);
 for category = 1:numel(categories)
     legendDummies(category) = ...

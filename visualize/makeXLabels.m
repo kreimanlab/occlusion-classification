@@ -46,7 +46,7 @@ function str = makeStr(timesteps)
 str = repmat(' ', size(timesteps, 1), 3);
 for row = 1:size(timesteps, 1)
     if ~isempty(timesteps{row}) && ~any(isnan(timesteps{row}))
-        str(row, :) = sprintf('%3d', timesteps{row});
+        str(row, :) = sprintf('%-3d', timesteps{row});
     end
 end
 end
