@@ -39,8 +39,8 @@ for featureExtractorIter = 1:length(featureExtractors)
         1, size(features, 1));
     
     % occluded
-    parfor dataIter = 1:size(data, 1) / 1000 - 1
-        dataStart = dataIter * 1000 + 1;
+    parfor dataIter = 1:size(data, 1) / 1000
+        dataStart = (dataIter - 1) * 1000 + 1;
         dataEnd = dataStart + 999;
         if ~any(ismember(dataSelection, dataStart:dataEnd))
             continue;
