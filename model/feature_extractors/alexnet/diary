@@ -1,6 +1,0 @@
-figure();
-wd = netParams.weights(1).weights{1};
-wd = mat2gray(wd);
-wd = imresize(wd,5);
-montage(wd);
-diary
