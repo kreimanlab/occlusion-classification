@@ -12,7 +12,8 @@ dataset = filterHumanData(dataset);
 [meanValues, standardErrorOfTheMean, percentBlackCenters] = ...
     statsAcrossAll(dataset, percentsBlack);
 plot = errorbar(permute(100 - percentBlackCenters, [2 1]), ...
-    meanValues, standardErrorOfTheMean, 'blacko-');
+    meanValues, standardErrorOfTheMean, 'blacko-', 'MarkerSize', 4);
+set(plot, 'MarkerFaceColor', get(plot, 'Color')); % fill
 text(100 - percentsBlack(1) + 1, meanValues(1), 'human');
 end
 

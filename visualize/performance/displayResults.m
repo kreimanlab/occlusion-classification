@@ -34,7 +34,7 @@ standardErrorOfTheMean = std(accuracies, 0, dimKfolds, 'omitnan') / ...
 % plots
 xlim([min(percentsVisible) - 3, max(percentsVisible) + 8]);
 x = permute(repmat(percentsVisible, length(classifierNames), 1), [2 1]);
-p = errorbar(x, meanValues, standardErrorOfTheMean, 'o-');
+p = errorbar(x, meanValues, standardErrorOfTheMean, 'o-', 'MarkerSize', 4);
 modelColors = adjustModelColors(p, classifierNames);
 hold on;
 % text labels
