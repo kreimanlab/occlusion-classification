@@ -1,11 +1,16 @@
 function figures = plotWholeVsOccludedTsne(...
-    featureExtractors, figurePrefix)
+    featureExtractors, figurePrefix, seed)
+if ~exist('seed', 'var')
+    seed = 0;
+end
 
 % data
 dataset = load('data/data_occlusion_klab325v2.mat');
 dataset = dataset.data;
 dataSelection = 1:size(dataset, 1);
-featureProviderFactory = FeatureProviderFactory(dataset, dataSelection);
+[trainDir, testDir] = getFeaturesDirectories();
+featureProviderFactory = FeatureProviderFactory(...
+        trainDir, testDir, dataset.pres, dataSelection);
 % selection
 [~, rows] = unique(dataset.pres(:)); % pick one version of each object
 rows = rows';
@@ -13,7 +18,6 @@ rows = rows';
 labels = dataset.truth(rows);
 % feature extractors
 if ~exist('featureExtractors', 'var')
-    featureProviderFactory = FeatureProviderFactory(dataset, dataSelection);
     featureExtractors = {featureProviderFactory.get(AlexnetFc7Features())};
 end
 if ~iscell(featureExtractors)
@@ -44,7 +48,7 @@ for featIter = 1:numRows
     end
     assert(~any(isnan(occludedFeatures(:))));
     % do tsne
-    rng(0, 'twister');
+    rng(seed, 'twister');
     mappedX = tsne([wholeFeatures; occludedFeatures], [], 2);
     mappedXWhole = mappedX(1:size(wholeFeatures, 1), :);
     % plot
