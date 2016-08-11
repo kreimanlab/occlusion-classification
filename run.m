@@ -13,12 +13,14 @@ dataset = dataset.data;
 argParser = inputParser();
 argParser.KeepUnmatched = true;
 argParser.addParameter('dataSelection', 1:size(dataset, 1), @isnumeric);
+argParser.addParameter('excludeCategories', [], @isnumeric);
 argParser.addParameter('featureExtractors', {});
 
 argParser.parse(varargin{:});
 fprintf('Running %s in %s with args:\n', task, pwd);
 disp(argParser.Results);
 dataSelection = argParser.Results.dataSelection;
+excludedCategories = argParser.Results.excludeCategories;
 featureExtractors = argParser.Results.featureExtractors;
 [trainDir, testDir] = getFeaturesDirectories();
 
@@ -29,11 +31,17 @@ switch task
             trainDir, testDir, dataset.pres, dataSelection);
         featureExtractors = cellfun(@(f) featureProviderFactory.get(f), ...
             featureExtractors, 'UniformOutput', false);
+        varargin = replaceVararg(varargin, ...
+            'featureExtractors', featureExtractors);
         classifier = @LibsvmClassifierCCV;
-        runClassification(dataset, ...
+        dataSelection = dataSelection(...
+            ~ismember(dataset.truth(dataSelection), excludedCategories));
+        varargin = replaceVararg(varargin, 'dataSelection', dataSelection);
+        runTask(...
             'dataPath', [fileparts(mfilename('fullpath')), '/data'], ...
-            'dataSelection', dataSelection, ...
-            'featureExtractors', featureExtractors, ...
+            'kfoldValues', unique(dataset.pres(dataSelection)), ...
+            'getRows', curry(@getRows, dataset, dataSelection), ...
+            'getLabels', @(rows) dataset.truth(rows), ...
             'classifier', classifier, ...
             varargin{:});
     case 'features'
@@ -72,5 +80,21 @@ switch task
             varargin{:});
     otherwise
         error('Unknown task %s', task);
+end
+end
+
+
+function rows = getRows(dataset, dataSelection, pres, runType)
+if runType == RunType.Train
+    selectedData = dataset(dataSelection, :);
+    [~, rows] = unique(selectedData, 'pres');
+    rows = dataSelection(rows);
+else
+    rows = dataSelection;
+end
+rows = rows(ismember(dataset.pres(rows), pres));
+assert(all(sort(unique(dataset.pres(rows))) == sort(pres)));
+if runType == RunType.Train
+    assert(length(rows) == length(pres));
 end
 end
