@@ -3,9 +3,7 @@ function displayResults(results, getAccuracies)
 if ~exist('collectAccuracies', 'var')
     getAccuracies = @collectAccuracies;
 end
-if ~iscell(results)
-    results = {results};
-end
+results = joinExperimentData(results);
 
 %% Prepare
 percentsBlack = [65:5:95, 99];
