@@ -27,11 +27,16 @@ rnn1Results = changeResults(filterResults(rnn1Results.results, ...
     regexp(r.name, 'train1cat/split-[0-5]_t\-4\/features-libsvmccv'))), ...
     'name', @(r) repmat({'RNN1'}, [size(r, 1), 1]));
 rnn1Results = collapseResults(rnn1Results);
+% RNN-masked
+rnnMaskedResults = getRnnMaskedResults();
 
 %% comparisons
 pairs = {hopResults, fc7Results; ...
     rnn5Results, humanResults; ...
     rnn1Results, fc7Results};
+for i = 1:numel(rnnMaskedResults)
+    pairs(end + 1, :) = {rnnMaskedResults{i}, rnn5Results};
+end
 for row = 1:size(pairs, 1)
     results1 = pairs{row, 1};
     results2 = pairs{row, 2};
@@ -42,10 +47,11 @@ for row = 1:size(pairs, 1)
     overall1 = getAccuracies(results1);
     overall2 = getAccuracies(results2);
     [h, p] = chi2(overall1, overall2);
-    fprintf(['[6C] overall %s: %.0f%% +- %.2f%%, != %s (%.2f%%): ', ...
+    fprintf(['[6C] overall %5s: %.0f%% +- %.2f%%, != %5s (%.2f%% +- %.2f%%): ', ...
         'h=%d, p=%d\n'], ...
         name1{:}, 100 * mean(correct1), 100 * stderrmean(correct1), ...
-        name2{:}, 100 * mean(correct2), h, p);
+        name2{:}, 100 * mean(correct2), 100 * stderrmean(correct2), ...
+        h, p);
 end
 end
 
@@ -59,5 +65,22 @@ for iBlack = 1:length(percentsBlack)
         getPercentBlackRange(percentsBlack, iBlack);
     accuracies(iBlack) = collectAccuracies({results}, ...
         blackMin, blackMax, classifierName);
+end
+end
+
+function rnnMaskedResults = getRnnMaskedResults()
+results = load('data/results/classification/rnn-masking.mat');
+results = results.results;
+masks = 0:4;
+timestep = 4;
+rnnMaskedResults = cell(size(masks));
+for maskIter = 1:numel(masks)
+    mask = masks(maskIter);
+    currentResults = filterResults(results, ...
+        @(r) cell2mat(cellfun(@(s) ~isempty(s), ...
+        strfind(r.name, sprintf('mask%d-rnn-t%d', mask, timestep)), ...
+        'UniformOutput', false)));
+    currentResults = joinExperimentData(currentResults);
+    rnnMaskedResults{maskIter} = collapseResults(currentResults);
 end
 end

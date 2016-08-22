@@ -1,4 +1,4 @@
-function plotOverallPerformanceOverTime(results)
+function [plots, texts] = plotOverallPerformanceOverTime(results)
 %% collect
 kfolds = length(results);
 [modelNames, modelTimestepNames, timesteps] = ...
@@ -24,8 +24,9 @@ plots = plotWithScaledX(timesteps, meanValues, ...
 adjustModelColors([plots{:, 1}], modelNames);
 hold on;
 % text
+texts = NaN(size(modelNames));
 for modelIter = 1:numel(modelNames)
-    text(length(timesteps(modelIter, :)) - 1, ...
+    texts(modelIter) = text(length(timesteps(modelIter, :)) - 1, ...
         mean(performances(modelIter, :), 'omitnan'), ...
         modelNames{modelIter}, 'Color', get(plots{modelIter}, 'Color'));
 end
