@@ -9,6 +9,10 @@ rnn1Results = load('data/results/classification/train1cat/excludeTrainCategory/m
 rnn1Results = rnn1Results.results;
 rnnAcrossAllResults = load('data/results/classification/rnn-across_all.mat');
 rnnAcrossAllResults = rnnAcrossAllResults.results;
+rnnMaskingResults = load('data/results/classification/rnn-masking.mat');
+rnnMaskingResults = rnnMaskingResults.results;
+hopMaskingResults = load('data/results/classification/hop-masking.mat');
+hopMaskingResults = hopMaskingResults.results;
 fc7Results = filterResults(rnn5Results, ...
     @(r) strcmp(r.name, 'RNN_features_fc7_noRelu_t0-libsvmccv'));
 fc7Results = changeResults(fc7Results, 'name', ...
@@ -117,6 +121,13 @@ figs = plotCategoryCorrelationExemplarsOverTime(...
     corrData, '6E_S3-similarity_exemplars-per_category');
 figures(end + 1:end + numel(figs)) = figs;
 
+%% masking
+% RNN
+figures(end + 1) = figure('Name', '6F_1-masking_RNN');
+plotRnnMaskingOverTime(rnnMaskingResults);
+% Hop
+figures(end + 1) = figure('Name', '6F_2-masking_Hop');
+plotHopMaskingOverTime(hopMaskingResults);
 
 %% save figures
 for fig = figures
