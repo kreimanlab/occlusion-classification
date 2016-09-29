@@ -10,7 +10,7 @@ rng(0, 'twister');
 modelResults = collapseResults(modelResults);
 
 %% setup
-[~, ~, ~, modelColors] = getModelLabels();
+[~, modelColors] = getModelLabels();
 numPartitions = 20;
 humanResults = load('data/data_occlusion_klab325v2.mat');
 [humanResults, relevantRows] = filterHumanData(humanResults.data);

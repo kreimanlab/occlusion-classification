@@ -22,8 +22,12 @@ for i = 1:numel(modelData)
         modelData{i} = dataset2table(modelData{i});
     end
     % get rid of redundant info
-    modelData{i}.truth = [];
-    modelData{i}.black = [];
+    if ismember('truth', modelData{i}.Properties.VariableNames)
+        modelData{i}.truth = [];
+    end
+    if ismember('black', modelData{i}.Properties.VariableNames)
+        modelData{i}.black = [];
+    end
     
     modelExperimentData{i} = join(modelData{i}, experimentData, ...
         'LeftKeys', 'testrows', 'RightKeys', 'rows');

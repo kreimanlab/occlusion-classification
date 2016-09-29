@@ -1,11 +1,12 @@
 function [abbreviatedNames, timestepNames, timesteps] = ...
     collectModelProperties(modelResults)
 modelResults = collapseResults(modelResults);
-modelPrefixes = {'rnn', 'caffe', 'rnn4'};
+modelPrefixes = {'rnn', 'hop', 'rnn4', 'rnn1', 'caffenet_relu7-libsvm'};
 typeAbbreviations = getModelLabels();
 uniqueNames = sort(unique(modelResults.name));
 modelOccurrences = cell2mat(...
-    cellfun(@(s) sum(cell2mat(strfind(lower(uniqueNames), s))), ...
+    cellfun(@(s) sum(cellfun(@(r) ~isempty(r), ...
+    regexp(lower(uniqueNames), s, 'once'))), ...
     modelPrefixes, 'UniformOutput', false));
 abbreviatedNames = typeAbbreviations(logical(modelOccurrences));
 rows = numel(abbreviatedNames);
@@ -37,6 +38,6 @@ token = regexp(classifierName, '[_\-]t(?:imestep)?\-?([0-9]+)', 'tokens');
 if isempty(token)
     timestep = 0;
 else
-    timestep = str2double(token{1}{1});
+    timestep = str2double(token{end}{1});
 end
 end
