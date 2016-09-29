@@ -1,4 +1,4 @@
-# Research on the recognition of occluded images
+# Classification of occluded images in neural networks and humans
 ##### Kreiman Lab, Harvard Medical School
 
 Constraints:

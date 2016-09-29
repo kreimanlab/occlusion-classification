@@ -1,5 +1,6 @@
 # data
-data/features/**
+**/features/**/*.mat
+**/features/**/*.txt
 
 ### Matlab template
 ##---------------------------------------------------
