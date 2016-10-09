@@ -1,13 +1,19 @@
-function displayResults(results, getAccuracies)
+function displayResults(results, experimentData, percentsBlack, getAccuracies)
 
 if ~exist('collectAccuracies', 'var')
     getAccuracies = @collectAccuracies;
 end
-results = joinExperimentData(results);
+if ~exist('experimentData', 'var')
+    experimentData = load('data_occlusion_klab325v2.mat');
+    experimentData = experimentData.data;
+end
+if ~exist('percentsBlack', 'var')
+    percentsBlack = [65:5:95, 99];
+end
+results = joinExperimentData(results, experimentData);
 
 %% Prepare
-percentsBlack = [65:5:95, 99];
-if any(results{1}.black == 0)
+if any(results{1}.black == 0) && ~ismember(0, percentsBlack)
     percentsBlack = [0, percentsBlack];
 end
 percentsVisible = NaN(size(percentsBlack));
