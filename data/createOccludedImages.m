@@ -1,4 +1,4 @@
-function createOccludedImages
+function createOccludedImages(data, outputName)
 
 %% Setup
 % bubbles
@@ -7,16 +7,21 @@ bub_sig = 14;
 dir = fileparts(mfilename('fullpath'));
 imagesData = load([dir '/KLAB325.mat']);
 originalImages = imagesData.img_mat;
-occlusionDataFile = [dir '/data_occlusion_klab325v2.mat'];
-load(occlusionDataFile);
+if ~exist('data', 'var')
+    occlusionDataFile = [dir '/data_occlusion_klab325v2.mat'];
+    load(occlusionDataFile);
+end
 % output
-outputFile = [dir '/KLAB325-occluded.mat'];
+if ~exist('outputName', 'var')
+    outputName = 'KLAB325-occluded.mat';
+end
+outputFile = [dir '/' outputName];
 
 %% Run
 img_mat = cell(1, length(originalImages));
-for i = 1:length(originalImages)
+for i = 1:length(data)
     disp(['image #' num2str(i)])
-    image = originalImages{i};
+    image = originalImages{data.pres(i)};
     numBubbles = data.nbubbles(i);
     c = data.bubble_centers(i, 1:numBubbles);
     

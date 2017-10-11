@@ -1,5 +1,8 @@
 function figures = plotWholeVsOccludedTsne(...
-    featureExtractors, figurePrefix, seed)
+    featureExtractors, figurePrefix, seed, dimensions)
+if ~exist('dimensions', 'var')
+    dimensions = 4096;
+end
 if ~exist('seed', 'var')
     seed = 0;
 end
@@ -28,8 +31,8 @@ end
 [numRows, numCols] = size(featureExtractors);
 figures = NaN(numRows * numCols, 1);
 for featIter = 1:numRows
-    wholeFeatures = NaN(325, 4096);
-    occludedFeatures = NaN(numel(rows) * numCols, 4096);
+    wholeFeatures = NaN(325, dimensions);
+    occludedFeatures = NaN(numel(rows) * numCols, dimensions);
     % show over time
     for timeIter = 1:numCols
         extractor = featureExtractors{featIter, timeIter};

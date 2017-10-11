@@ -19,6 +19,7 @@ argParser.addParameter('excludeCategories', [], @isnumeric);
 argParser.addParameter('featureExtractors', {});
 argParser.addParameter('trainDirectory', [], @(p) exist(p, 'dir'));
 argParser.addParameter('testDirectory', [], @(p) exist(p, 'dir'));
+argParser.addParameter('bipolarizationValue', 0, @isnumeric);
 
 argParser.parse(varargin{:});
 fprintf('Running %s in %s with args:\n', task, pwd);
@@ -33,6 +34,7 @@ excludedCategories = argParser.Results.excludeCategories;
 featureExtractors = argParser.Results.featureExtractors;
 trainDir = argParser.Results.trainDirectory;
 testDir = argParser.Results.testDirectory;
+bipolarizationValue = argParser.Results.bipolarizationValue;
 
 %% Run
 switch task
@@ -81,8 +83,8 @@ switch task
         featureProviderFactory = FeatureProviderFactory(trainDir, testDir, ...
             dataset.pres, 1:length(dataset));
         featureExtractor = HopFeatures(max(savesteps), ...
-            BipolarFeatures(0, ...
-            featureProviderFactory.get(AlexnetFc7Features())));
+            BipolarFeatures(bipolarizationValue, ...
+            featureProviderFactory.get(featureExtractors)));
         weightsDirectory = [trainDir, '/../weights/'];
         if ~exist(weightsDirectory, 'dir')
             mkdir(weightsDirectory);
@@ -101,7 +103,7 @@ switch task
             objects, objects);
         featureExtractor = HopFeatures(max(savesteps), ...
             BipolarFeatures(0, ...
-            featureProviderFactory.get(AlexnetFc7Features())));
+            featureProviderFactory.get(featureExtractors)));
         weightsDirectory = [trainDir, '/../weights-imagenet/'];
         if ~exist(weightsDirectory, 'dir')
             mkdir(weightsDirectory);

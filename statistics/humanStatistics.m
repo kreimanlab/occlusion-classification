@@ -11,7 +11,7 @@ visibility100 = unmaskedNewData.correct(unmaskedNewData.occluded == 0);
 visibility35 = getCorrect(unmaskedData, 35);
 [h, p] = ttest2(visibility35, visibility100);
 assert(h == 1);
-fprintf('[2A] 35%% visibility: %.0f%% +- %.0f%%, != 100%%: p=%d\n', ...
+fprintf('[2A] 35%% visibility: %.0f+-%.0f%%, != 100%%: p=%d\n', ...
     100 * mean(visibility35), 100 * stderrmean(visibility35), p);
 
 %% 10% visibility vs chance
@@ -20,7 +20,7 @@ chance = ones(size(visibility10));
 chance(randsample(numel(chance), round(0.8 * numel(chance)))) = 0;
 [h, p] = ttest2(visibility10, chance);
 assert(h == 1);
-fprintf('[2A] 10%% visibility: %.0f%% +- %.0f%%, != chance: p=%d\n', ...
+fprintf('[2A] 10%% visibility: %.0f+-%.0f%%, != chance: p=%d\n', ...
     100 * mean(visibility10), 100 * stderrmean(visibility10), p);
 
 %% partial vs occluder
@@ -44,7 +44,9 @@ for soa = soas
     maskedPerformance = data.correct(...
         data.soa == soa & data.masked == 1);
     [h, p] = ttest2(unmaskedPerformance, maskedPerformance);
-    fprintf('%.3f soa: ttest2 = %d, p = %d\n', soa, h, p);
+    fprintf('%.3f soa: unmasked %.0f+-%.0f%%, masked %.0f+-%.0f%% | ttest2 = %d, p = %d\n', ...
+        soa, 100 * mean(unmaskedPerformance), 100 * stderrmean(unmaskedPerformance), ...
+        100 * mean(maskedPerformance), 100 * stderrmean(maskedPerformance), h, p);
 end
 end
 
@@ -54,11 +56,4 @@ visibilityRight = visibility;
 correct = data.correct(...
     data.black >= 100 - visibilityRight & ...
     data.black <= 100 - visibilityLeft);
-end
-
-function [score, degreesOfFreedom, p] = chisq(O, E)
-assert(numel(O) == numel(E));
-score = sum(arrayfun(@(i) pow2(O(i) - E(i)) / E(i), 1:numel(O)));
-degreesOfFreedom = (2 - 1) * (numel(O) - 1); % vars-1 * observations-1
-p = chi2cdf(score, degreesOfFreedom);
 end

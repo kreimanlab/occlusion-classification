@@ -1,19 +1,16 @@
-function modelExperimentData = joinExperimentData(modelData)
+function modelExperimentData = joinExperimentData(modelData, experimentData)
 if ~iscell(modelData)
     modelData = {modelData};
 end
+if ~exist('experimentData', 'var')
+    experimentData = load('data_occlusion_klab325v2.mat');
+end
 
-experimentData = load('data_occlusion_klab325v2.mat');
-experimentData = dataset2table(experimentData.data);
+experimentData = dataset2table(experimentData);
 experimentData.rows = (1:size(experimentData, 1))';
 % delete human data
-experimentData.responses = [];
-experimentData.response_category = [];
-experimentData.reaction_times = [];
-experimentData.correct = [];
-experimentData.subject = [];
-experimentData.VBLsoa = [];
-experimentData.masked = [];
+experimentData = deleteVars(experimentData, {'responses', 'response_category', ...
+    'reaction_times', 'correct', 'subject', 'VBLsoa', 'masked'});
 
 modelExperimentData = cell(size(modelData));
 for i = 1:numel(modelData)
@@ -31,5 +28,14 @@ for i = 1:numel(modelData)
     
     modelExperimentData{i} = join(modelData{i}, experimentData, ...
         'LeftKeys', 'testrows', 'RightKeys', 'rows');
+end
+end
+
+function data = deleteVars(data, vars)
+for varIter = 1:numel(vars)
+    var = vars{varIter};
+    if ismember(var, data.Properties.VariableNames)
+        data.(var) = [];
+    end
 end
 end

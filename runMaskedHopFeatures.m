@@ -1,4 +1,4 @@
-function runMaskedHopFeatures(objectForRow, varargin)
+function runMaskedHopFeatures(tExp, objectForRow, varargin)
 
 %% Args
 argParser = inputParser();
@@ -21,17 +21,20 @@ net = load(netFile);
 net = net.net;
 featureProviderFactory = FeatureProviderFactory(...
     trainDir, testDir, objectForRow, dataSelection);
-maskedProvider = BipolarFeatures(0,featureProviderFactory.get(NamedFeatures('alexnet-relu7-masked')));
-maskSavesteps = [1:16, 32, 64, 128, 256];
+maskedProvider = BipolarFeatures(0,featureProviderFactory.get(NamedFeatures('alexnet-fc7-masked')));
+maskSavesteps = [1, 2, 4, 8, 16, 32, 64, 128, 256]; % = 2.^(0:8)
 
 %% Run
-for tExp = -1:8
+%for tExp = -1:8
     if tExp == -1
-        normalProvider = BipolarFeatures(0, featureProviderFactory.get(AlexnetRelu7Features()));
+        t = 0;
+        normalProvider = BipolarFeatures(0, featureProviderFactory.get(AlexnetFc7Features()));
     else
         t = 2 ^ tExp;
         normalProvider = featureProviderFactory.get(NamedFeatures(sprintf('caffenet_relu7-bipolar0-hop_t%d', t)));
     end
+    maxStep = 256 - t;
+    savesteps = union(maskSavesteps(maskSavesteps < maxStep), [maxStep, 256]);
     
     summedFeatures = CombineFeatures(@sumFeatures, ...
         normalProvider, maskedProvider);
@@ -41,10 +44,10 @@ for tExp = -1:8
         'trainDirectory', trainDir, 'testDirectory', testDir, ...
         'weightsDirectory', '.', ... % won't be used anyway
         'featureExtractor', hopExtractor, ...
-        'savesteps', maskSavesteps, ...
+        'savesteps', savesteps, ...
         'omitTrain', true, ...
         varargin{:});
-end
+%end
 end
 
 function f = sumFeatures(f1, f2)
