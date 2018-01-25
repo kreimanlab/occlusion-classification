@@ -14,8 +14,12 @@ for i = 1:numel(images)
         occludedImages{i} = images{i};
         bubbleMask = ones(size(occludedImages{i}));
     end
-    [imageVisible(i), backgroundVisible(i)] = ...
-        getPercentVisible(backgroundMasks{i}, bubbleMask);
+    if backgroundMasks
+        [imageVisible(i), backgroundVisible(i)] = ...
+            getPercentVisible(backgroundMasks{i}, bubbleMask);
+    else
+        imageVisible(i) = NaN; backgroundVisible(i) = NaN;
+    end
 end
 end
 
