@@ -6,7 +6,11 @@ if ~iscell(results)
 end
 for i = 1:numel(results)
     r = results{i};
-    r.(variable) = provide(r);
+    if isempty(provide)
+        r.(variable) = [];  % have to delete this way because Matlab sucks
+    else
+        r.(variable) = provide(r);
+    end
     results{i} = r;
 end
 end
