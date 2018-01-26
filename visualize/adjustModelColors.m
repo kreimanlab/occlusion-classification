@@ -8,8 +8,9 @@ end
 mappedModelColors = cell(size(plotModelNames));
 for i = 1:numel(plots)
     matched = false;
+    modelNameInPlot = plotModelNames{i};
     for l = 1:numel(modelLabels)
-        if strcmp(plotModelNames{i}, modelLabels{l})
+        if strcmp(modelNameInPlot, modelLabels{l})
             color = setColor(plots(i), colorProperty, modelColors{l});
             mappedModelColors{i} = color;
             matched = true;
@@ -17,7 +18,12 @@ for i = 1:numel(plots)
         end
     end
     if ~matched
-        mappedModelColors{i} = get(plots(i), 'Color');
+        warning('No match for %s', modelNameInPlot);
+        try
+            mappedModelColors{i} = get(plots(i), 'Color');
+        catch
+            warning('Failed to retrieve color from plot');
+        end
     end
 end
 end

@@ -8,6 +8,12 @@ modelOccurrences = cell2mat(...
     cellfun(@(s) sum(cellfun(@(r) ~isempty(r), ...
     regexp(lower(uniqueNames), s, 'once'))), ...
     modelPrefixes, 'UniformOutput', false));
+if ~any(modelOccurrences)
+    warning('collapsing model to single timestep');
+    abbreviatedNames = uniqueNames; timestepNames = abbreviatedNames;
+    timesteps = 0;
+    return;
+end
 abbreviatedNames = typeAbbreviations(logical(modelOccurrences));
 rows = numel(abbreviatedNames);
 cols = max(modelOccurrences);
