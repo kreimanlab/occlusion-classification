@@ -94,7 +94,7 @@ function occlusionFilename = adjustFilenameOcclusion(filepath)
 if ~isempty(path)
     path = [path, '/'];
 end
-occlusionFilename = [path, name, '-occluded', ext];
+occlusionFilename = [path, name, '-occluded', upper(ext)];
 end
 
 function croppedImage = resizedCenterCrop(image, targetSize)
