@@ -20,6 +20,8 @@ argParser.addParameter('featureExtractors', {});
 argParser.addParameter('trainDirectory', [], @(p) exist(p, 'dir'));
 argParser.addParameter('testDirectory', [], @(p) exist(p, 'dir'));
 argParser.addParameter('bipolarizationValue', 0, @isnumeric);
+argParser.addParameter('resultsFilename', ...
+    datestr(datetime(), 'yyyy-mm-dd_HH-MM-SS'), @ischar);
 
 argParser.parse(varargin{:});
 fprintf('Running %s in %s with args:\n', task, pwd);
@@ -58,6 +60,7 @@ switch task
             'getRows', curry(@getRows, dataset, dataSelection), ...
             'getLabels', @(rows) dataset.truth(rows), ...
             'classifier', classifier, ...
+            'resultsFilename', [argParser.Results.resultsFilename, '.mat'], ...
             varargin{:});
     case 'features'
         adjustTestImages = createAdjustTestImages(dataset);
