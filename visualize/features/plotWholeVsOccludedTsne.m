@@ -1,15 +1,17 @@
 function figures = plotWholeVsOccludedTsne(...
-    featureExtractors, figurePrefix, seed, dimensions)
+    featureExtractors, figurePrefix, seed, dimensions, dataset)
 if ~exist('dimensions', 'var')
     dimensions = 4096;
 end
 if ~exist('seed', 'var')
     seed = 0;
 end
+if ~exist('dataset', 'var')
+    dataset = load('data/data_occlusion_klab325v2.mat');
+    dataset = dataset.data;
+end
 
 % data
-dataset = load('data/data_occlusion_klab325v2.mat');
-dataset = dataset.data;
 dataSelection = 1:size(dataset, 1);
 [trainDir, testDir] = getFeaturesDirectories();
 featureProviderFactory = FeatureProviderFactory(...
