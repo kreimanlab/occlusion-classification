@@ -87,7 +87,29 @@ for row = 1:size(pairs, 1)
         find(size(accuracies2) > 1, 1, 'last'))), ...
         h, p);
 end
+
+% print raw performances
+checkResults('alexnet-whole');
+checkResults('alexnet-retrained-whole');
 end
+
+function checkResults(filename)
+results = load(['data/results/classification/', filename, '.mat']);
+results = results.results;
+assert(numel(unique(results{1}.name)) == 1);
+
+performanceMeans = NaN(numel(results), 1);
+numErrors = 0;
+for i = 1:numel(results)
+    performanceMeans(i) = mean(results{i}.correct);
+    numErrors = numErrors + sum(~results{i}.correct);
+end
+performanceMeans = 100 * performanceMeans;
+fprintf(['[%s] Performance means of %d cross-validations: ', ...
+    '%.2f +- %.2f%% (%d errors)\n'], filename, numel(results), ...
+    mean(performanceMeans), stderrmean(performanceMeans), numErrors);
+end
+
 
 function accuracies = getAccuracies(results)
 classifierName = unique(results{1}.name);
