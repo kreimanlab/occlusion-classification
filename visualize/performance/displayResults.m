@@ -1,16 +1,20 @@
-function displayResults(results, experimentData, percentsBlack, getAccuracies)
+function displayResults(results, experimentData, percentsBlack, getAccuracies, plotHuman)
 
-if ~exist('collectAccuracies', 'var')
+if ~exist('getAccuracies', 'var') || isempty(getAccuracies)
     getAccuracies = @collectAccuracies;
 end
 if ~exist('experimentData', 'var')
-    experimentData = load('data_occlusion_klab325v2.mat');
-    experimentData = experimentData.data;
+    experimentData = loadData('data_occlusion_klab325v2.mat', 'data');
 end
 if ~exist('percentsBlack', 'var')
     percentsBlack = [65:5:95, 99];
 end
-results = joinExperimentData(results, experimentData);
+if ~exist('plotHuman', 'var')
+    plotHuman = true;
+end
+if ~isa(experimentData, 'logical') || experimentData
+    results = joinExperimentData(results, experimentData);
+end
 
 %% Prepare
 if any(results{1}.black == 0) && ~ismember(0, percentsBlack)
@@ -49,7 +53,7 @@ end
 % chance
 plot(get(gca,'xlim'), [chanceLevel chanceLevel], '--k');
 % human
-if chanceLevel == 20
+if plotHuman
     ylim([0 100]);
     plotHumanPerformance(percentsBlack);
 end
