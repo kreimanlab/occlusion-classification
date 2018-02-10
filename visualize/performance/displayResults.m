@@ -54,9 +54,9 @@ end
 plot(get(gca,'xlim'), [chanceLevel chanceLevel], '--k');
 % human
 if plotHuman
-    ylim([0 100]);
     plotHumanPerformance(percentsBlack);
 end
+ylim([0 100]);
 xlabel('Percent Visible');
 ylabel('Performance');
 set(gcf, 'Color', 'w');
