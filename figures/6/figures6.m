@@ -114,7 +114,7 @@ plotCorrelationOverTime(corrData);
 figures(end + 1) = figure('Name', '6E_S1-similarity_exemplars');
 plotExemplarCorrelationsOverTime(corrData);
 % per category
-figures(end + 1) = figure('Name', '6E_S2-correlation_vs_time-per_category');
+figures(end + 1) = figure('Name', '4E-correlation_vs_time-per_category');
 plotCategoryCorrelationOverTime(corrData);
 % exemplars
 figs = plotCategoryCorrelationExemplarsOverTime(...
@@ -128,6 +128,14 @@ plotRnnMaskingOverTime(rnnMaskingResults);
 % Hop
 figures(end + 1) = figure('Name', '6F_2-masking_Hop');
 plotHopMaskingOverTime(hopMaskingResults);
+% correlations vs time
+if ~exist('maskCorrData', 'var')
+    [modelHumanCorrelationsPerCategory, humanTimesteps, modelTimesteps] = ...
+        collectModelHumanMaskingCorrelationData(hopMaskingResults);
+end
+figures(end + 1) = figure('Name', 'masking-correlation_by_time');
+plotMaskingCategoryCorrelations(modelHumanCorrelationsPerCategory, humanTimesteps, modelTimesteps);
+
 
 %% save figures
 for fig = figures
