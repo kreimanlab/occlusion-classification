@@ -4,6 +4,7 @@ if ~iscell(modelData)
 end
 if ~exist('experimentData', 'var')
     experimentData = load('data_occlusion_klab325v2.mat');
+    experimentData = experimentData.data;
 end
 
 experimentData = dataset2table(experimentData);
