@@ -1,10 +1,18 @@
 # Classification of occluded images in neural networks and humans
 ##### Kreiman Lab, Harvard Medical School
 
-Constraints:
-* only train on whole images, test on occluded ones
-* use the same classifier on top of all the different feature extractors
+## Models
+All encoding models can be found here: https://github.com/kreimanlab/occlusion-models/tree/master/feature_extractors
 
+The Hopfield network is implemented here: https://github.com/kreimanlab/occlusion-models/blob/master/feature_extractors/hopfield/HopFeatures.m
+
+Models are trained only on whole images and tested on occluded ones, posing a strong test of invariance.
+
+## Setup
+Clone this repository, making sure to also pull the models submodule:
+`git clone --recurse-submodules https://github.com/kreimanlab/occlusion-classification.git`
+
+To run everything, you will also need datasets which are too big for Github and can be found here: http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
 ## Sample runs
 Creating inception features:
