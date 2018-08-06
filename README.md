@@ -1,11 +1,12 @@
 # Recurrent computations for visual pattern completion
-##### Kreiman Lab, Harvard Medical School
+
 Hanlin Tang, Martin Schrimpf, William Lotter, Charlotte Moerman, Ana Paredes, Josue Ortega Caro, Walter Hardesty, David Cox, Gabriel Kreiman
+##### Kreiman Lab, Harvard Medical School
 
 ## Additional data
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
-Stimuli: 
+####Stimuli: 
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#stimuli
 
 Behavioral data:
