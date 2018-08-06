@@ -3,28 +3,33 @@
 Hanlin Tang, Martin Schrimpf, William Lotter, Charlotte Moerman, Ana Paredes, Josue Ortega Caro, Walter Hardesty, David Cox, Gabriel Kreiman
 ##### Kreiman Lab, http://klab.tch.harvard.edu
 
-## Additional data
-http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
+![sample images](data/samples/sample_images.png)
 
-#### Stimuli: 
 
-stimuli folder
+## Data
+All the data can be found on this webpage: http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
+*Stimuli*:
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#stimuli
+![sample stimuli](data/samples/display_all_images.jpg)
 
-#### Behavioral data:
+*Behavioral data*:
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#psychophysics
+![behavioral task](data/samples/behavioral_task.png)
 
-#### Neurophysiological data:
+*Neurophysiological data*:
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#neurophysiology
+![neural delays](data/samples/neural_delays.png)
 
-#### Additional figures:
+*Additional figures*:
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations/WebFigures.pdf
 
 ## Models
 All encoding models can be found here: https://github.com/kreimanlab/occlusion-models/tree/master/feature_extractors
 
 The Hopfield network is implemented here: https://github.com/kreimanlab/occlusion-models/blob/master/feature_extractors/hopfield/HopFeatures.m
+
+![Recurrent Models][http://klab.tch.harvard.edu/resources/images/Tangetal_RecurrentComputations_Logo.jpg]
 
 Models are trained only on whole images and tested on occluded ones, posing a strong test of invariance.
 
