@@ -1,9 +1,14 @@
 ## README -- Stimuli
 
 load KLAB325.mat
+
+
 Variable name	Size	Bytes and Type	Comment
+
 avgSpectra     256x256	524288  double              	Average spectra
+
 bkgMask  	    1x325	  21335600  cell                	Binary object silhouette
+
 img_mat       1x325	  21335600  cell                	Each of the 325 objects
 
 display_all_images.m	-- Displays all 325 images 
