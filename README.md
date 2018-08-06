@@ -2,6 +2,9 @@
 ##### Kreiman Lab, Harvard Medical School
 Hanlin Tang, Martin Schrimpf, William Lotter, Charlotte Moerman, Ana Paredes, Josue Ortega Caro, Walter Hardesty, David Cox, Gabriel Kreiman
 
+## Additional data
+http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
+
 ## Models
 All encoding models can be found here: https://github.com/kreimanlab/occlusion-models/tree/master/feature_extractors
 
