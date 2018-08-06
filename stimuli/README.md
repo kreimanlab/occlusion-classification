@@ -19,3 +19,5 @@ Indices	Category
 316:320	Fruits
 241:300	Vehicles
 321:325	Vehicles
+
+![image](stimuil/display_all_images.jpg)
