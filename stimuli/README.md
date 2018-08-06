@@ -26,4 +26,4 @@ Indices |	Category
 241:300	| Vehicles
 321:325	| Vehicles
 
-[![Stimuli](stimuli/display_all_images.jpg)](stimuli/display_all_images.jpg)
+[![Stimuli](display_all_images.jpg)](display_all_images.jpg)
