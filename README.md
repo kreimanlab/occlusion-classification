@@ -1,6 +1,6 @@
 # Recurrent computations for visual pattern completion
 
-Hanlin Tang, Martin Schrimpf, William Lotter, Charlotte Moerman, Ana Paredes, Josue Ortega Caro, Walter Hardesty, David Cox, Gabriel Kreiman
+Hanlin Tang*, Martin Schrimpf*, William Lotter*, Charlotte Moerman, Ana Paredes, Josue Ortega Caro, Walter Hardesty, David Cox, Gabriel Kreiman
 ##### Kreiman Lab, http://klab.tch.harvard.edu
 
 ![sample images](data/samples/sample_images.png)
@@ -29,7 +29,7 @@ All encoding models can be found here: https://github.com/kreimanlab/occlusion-m
 
 The Hopfield network is implemented here: https://github.com/kreimanlab/occlusion-models/blob/master/feature_extractors/hopfield/HopFeatures.m
 
-![Recurrent Models][http://klab.tch.harvard.edu/resources/images/Tangetal_RecurrentComputations_Logo.jpg]
+![Recurrent Models](data/samples/model_illustration.jpg)
 
 Models are trained only on whole images and tested on occluded ones, posing a strong test of invariance.
 
