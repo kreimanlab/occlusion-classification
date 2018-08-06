@@ -5,6 +5,18 @@ Hanlin Tang, Martin Schrimpf, William Lotter, Charlotte Moerman, Ana Paredes, Jo
 ## Additional data
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
+Stimuli: 
+http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#stimuli
+
+Behavioral data:
+http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#psychophysics
+
+Neurophysiological data:
+http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#neurophysiology
+
+Additional figures:
+http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations/WebFigures.pdf
+
 ## Models
 All encoding models can be found here: https://github.com/kreimanlab/occlusion-models/tree/master/feature_extractors
 
