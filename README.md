@@ -1,5 +1,6 @@
-# Classification of occluded images in neural networks and humans
+# Recurrent computations for visual pattern completion
 ##### Kreiman Lab, Harvard Medical School
+Hanlin Tang, Martin Schrimpf, William Lotter, Charlotte Moerman, Ana Paredes, Josue Ortega Caro, Walter Hardesty, David Cox, Gabriel Kreiman
 
 ## Models
 All encoding models can be found here: https://github.com/kreimanlab/occlusion-models/tree/master/feature_extractors
