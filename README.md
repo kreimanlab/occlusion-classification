@@ -7,6 +7,7 @@ Hanlin Tang, Martin Schrimpf, William Lotter, Charlotte Moerman, Ana Paredes, Jo
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
 #### Stimuli: 
+stimuli/
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#stimuli
 
 #### Behavioral data:
