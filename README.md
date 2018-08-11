@@ -16,26 +16,34 @@ http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#stimul
 *Behavioral data*:
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#psychophysics
 ![behavioral task](data/samples/behavioral_task.png)
+Humans are robust at recognizing even highly occluded objects; 
+but their recognition is severely impaired through backward masking.
 
 *Neurophysiological data*:
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#neurophysiology
-![neural delays](data/samples/neural_delays.png)
+![neural delays](data/samples/neural.mp4)
+Decoding object identity from human cortex is delayed when images are occluded.
+These delays are correlated with the behavioral effect of backward masking.
 
 *Additional figures*:
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations/WebFigures.pdf
 
 ## Models
 All encoding models can be found here: https://github.com/kreimanlab/occlusion-models/tree/master/feature_extractors
+Models are trained only on whole images and tested on occluded ones, posing a strong test of invariance.
 
 The Hopfield network is implemented here: https://github.com/kreimanlab/occlusion-models/blob/master/feature_extractors/hopfield/HopFeatures.m
 
-![Recurrent Models](data/samples/model_illustration.jpg)
+![Recurrent Hopfield Attractor Network](data/samples/model_attractors.mp4)
 
-Models are trained only on whole images and tested on occluded ones, posing a strong test of invariance.
+Over time, the occluded representations converge towards their whole attractors (and in some cases, towards sparse states).
+The above video shows a sample of 300 occluded images converging towards attractors.
 
 ## Setup
 Clone this repository, making sure to also pull the models submodule:
 `git clone --recurse-submodules https://github.com/kreimanlab/occlusion-classification.git`
+
+You will need MATLAB, we used version R2016a.
 
 To run everything, you will also need datasets which are too big for Github and can be found here: http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
