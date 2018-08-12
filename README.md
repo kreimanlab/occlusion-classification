@@ -1,7 +1,6 @@
 # Recurrent computations for visual pattern completion
 
 Hanlin Tang*, Martin Schrimpf*, William Lotter*, Charlotte Moerman, Ana Paredes, Josue Ortega Caro, Walter Hardesty, David Cox, Gabriel Kreiman
-##### Kreiman Lab, http://klab.tch.harvard.edu
 
 ![sample images](data/samples/sample_images.png)
 
@@ -9,23 +8,25 @@ Hanlin Tang*, Martin Schrimpf*, William Lotter*, Charlotte Moerman, Ana Paredes,
 ## Data
 All the data can be found on this webpage: http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
-*Stimuli*:
+### Stimuli
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#stimuli
 ![sample stimuli](data/samples/display_all_images.jpg)
 
-*Behavioral data*:
+### Behavioral data
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#psychophysics
 ![behavioral task](data/samples/behavioral_task.png)
+
 Humans are robust at recognizing even highly occluded objects; 
 but their recognition is severely impaired through backward masking.
 
-*Neurophysiological data*:
+### Neurophysiological data
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html#neurophysiology
 ![neural delays](data/samples/neural.gif)
+
 Decoding object identity from human cortex is delayed when images are occluded.
 These delays are correlated with the behavioral effect of backward masking.
 
-*Additional figures*:
+### Additional figures
 http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations/WebFigures.pdf
 
 ## Models
@@ -39,7 +40,7 @@ The Hopfield network is implemented here: https://github.com/kreimanlab/occlusio
 Over time, the occluded representations converge towards their whole attractors (and in some cases, towards sparse states).
 The above video shows a sample of 300 occluded images converging towards attractors.
 
-## Setup
+### Setup
 Clone this repository, making sure to also pull the models submodule:
 `git clone --recurse-submodules https://github.com/kreimanlab/occlusion-classification.git`
 
@@ -47,7 +48,7 @@ You will need MATLAB, we used version R2016a.
 
 To run everything, you will also need datasets which are too big for Github and can be found here: http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
-## Sample runs
+### Sample runs
 Creating inception features:
 ```bash
 ./run.sh rnn \
@@ -102,8 +103,8 @@ displayResults(results, data);
 ```
 
 
-## Troubleshooting
-### libsvm compilation fails on Linux
+### Troubleshooting
+#### libsvm compilation fails on Linux
 To resolve the error 
 `cc1plus: error: unrecognized command line option "-std=c++11"`
 when compiling libsvm inside Matlab, 
