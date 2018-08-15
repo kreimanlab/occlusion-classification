@@ -2,6 +2,26 @@
 
 Hanlin Tang*, Martin Schrimpf*, William Lotter*, Charlotte Moerman, Ana Paredes, Josue Ortega Caro, Walter Hardesty, David Cox, Gabriel Kreiman
 
+<details><summary>Proceedings of the National Academy of Sciences (PNAS) Aug 2018, 201719397; DOI: 10.1073/pnas.1719397115</summary><p>
+
+```
+  @article{TangSchrimpfLotter2018,
+	author = {Tang, Hanlin and Schrimpf, Martin and Lotter, William and Moerman, Charlotte and Paredes, Ana and Ortega Caro, Josue and Hardesty, Walter and Cox, David and Kreiman, Gabriel},
+	title = {Recurrent computations for visual pattern completion},
+	year = {2018},
+	doi = {10.1073/pnas.1719397115},
+	publisher = {National Academy of Sciences},
+	abstract = {The ability to complete patterns and interpret partial information is a central property of intelligence. Deep convolutional network architectures have proved successful in labeling whole objects in images and capturing the initial 150 ms of processing along the ventral visual cortex. This study shows that human object recognition abilities remain robust when only small amounts of information are available due to heavy occlusion, but the performance of bottom-up computational models is impaired under limited visibility. The results provide combined behavioral, neurophysiological, and modeling insights showing how recurrent computations may help the brain solve the fundamental challenge of pattern completion.Making inferences from partial information constitutes a critical aspect of cognition. During visual perception, pattern completion enables recognition of poorly visible or occluded objects. We combined psychophysics, physiology, and computational models to test the hypothesis that pattern completion is implemented by recurrent computations and present three pieces of evidence that are consistent with this hypothesis. First, subjects robustly recognized objects even when they were rendered \&lt;15\% visible, but recognition was largely impaired when processing was interrupted by backward masking. Second, invasive physiological responses along the human ventral cortex exhibited visually selective responses to partially visible objects that were delayed compared with whole objects, suggesting the need for additional computations. These physiological delays were correlated with the effects of backward masking. Third, state-of-the-art feed-forward computational architectures were not robust to partial visibility. However, recognition performance was recovered when the model was augmented with attractor-based recurrent connectivity. The recurrent model was able to predict which images of heavily occluded objects were easier or harder for humans to recognize, could capture the effect of introducing a backward mask on recognition behavior, and was consistent with the physiological delays along the human ventral visual stream. These results provide a strong argument of plausibility for the role of recurrent computations in making visual inferences from partial information.},
+	issn = {0027-8424},
+	URL = {http://www.pnas.org/content/early/2018/08/07/1719397115},
+	eprint = {http://www.pnas.org/content/early/2018/08/07/1719397115.full.pdf},
+	journal = {Proceedings of the National Academy of Sciences}
+}
+```
+</p></details>
+
+http://www.pnas.org/content/early/2018/08/07/1719397115/
+
 ![sample images](data/samples/sample_images.png)
 
 
