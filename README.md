@@ -110,6 +110,8 @@ Training and predicting with SVM based on less-occlusion features:
     'testDirectory', '~/group/features/data_occlusion_klab325v2'"
 ```
 
+If you use pre-computed feature representations, every one of the 13000 feature rows corresponds to the same row in the behavioral data.
+
 Plotting results:
 ```MATLAB
 load('results.mat');
