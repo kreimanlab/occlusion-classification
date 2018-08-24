@@ -65,6 +65,7 @@ Clone this repository, making sure to also pull the models submodule:
 `git clone --recurse-submodules https://github.com/kreimanlab/occlusion-classification.git`
 
 You will need MATLAB, we used version R2016a.
+To use datasets, the "Statistics and Machine Learning Toolbox" is required.
 
 To run everything, you will also need datasets which are too big for Github and can be found here: http://klab.tch.harvard.edu/resources/Tangetal_RecurrentComputations.html
 
