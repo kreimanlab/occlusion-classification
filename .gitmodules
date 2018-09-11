@@ -1,5 +1,5 @@
 [submodule "model"]
 	path = model
-	url = git@github.com:kreimanlab/occlusion-models.git
+	url = https://github.com/kreimanlab/occlusion-models.git
 	branch = master
 	ignore = dirty
